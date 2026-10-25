@@ -4,15 +4,15 @@ services:
       context: .
       target: runtime
     ports:
-      - "${SRL_PORT:-3000}:3000"
+      - '${SRL_PORT:-3000}:3000'
     environment:
-      WRANGLER_SEND_METRICS: "false"
-      SRL_HOST: "0.0.0.0"
+      WRANGLER_SEND_METRICS: 'false'
+      SRL_HOST: '0.0.0.0'
       SRL_STATE_DIR: /app/data
-      OLLAMA_URL: "${OLLAMA_URL:-}"
-      OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen2.5:0.5b}"
+      OLLAMA_URL: '${OLLAMA_URL:-}'
+      OLLAMA_MODEL: '${OLLAMA_MODEL:-qwen2.5:0.5b}'
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     volumes:
       - recovery-data:/app/data
     restart: unless-stopped

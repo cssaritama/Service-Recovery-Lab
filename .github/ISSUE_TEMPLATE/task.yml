@@ -1,21 +1,21 @@
 name: Task
 description: A unit of work with observable acceptance criteria
-title: "[SRL-0N] "
-labels: [tracker, "status:todo"]
+title: '[SRL-0N] '
+labels: [tracker, 'status:todo']
 body:
   - type: input
     id: role
     attributes:
       label: Responsible role
       description: Product, Implementation, Verification or Delivery agent (see docs/agent-team.md)
-    validations: {required: true}
+    validations: { required: true }
   - type: textarea
     id: acceptance
     attributes:
       label: Acceptance criteria
       description: Observable, testable outcomes. One per line, as a checklist.
-      value: "- [ ] "
-    validations: {required: true}
+      value: '- [ ] '
+    validations: { required: true }
   - type: textarea
     id: evidence
     attributes:
