@@ -51,7 +51,7 @@ flowchart LR
 | Tools | `read_service_state`, `select_allowlisted_repair`, `restore_catalog` / `resume_adapter`, `exercise_reservation_api`, `request_operator_review` |
 | Authority | Two configuration repairs, scoped to one workspace, revision-checked |
 | Cannot | Edit reservations, change validation, touch other workspaces, run code, act on unknown faults |
-| Reasoner | Deterministic policy by default. An optional local LLM (Ollama) may advise, but disagreement → escalate. |
+| Reasoner | Deterministic policy plus a language-model second opinion: Workers AI in the cloud, Ollama locally. Disagreement, malformed output or timeout → escalate. |
 | Success | Positive probe 201 **and** negative probe 422 **and** persisted probe record **and** no remaining fault |
 | Otherwise | Escalate to the operator with the reason recorded in the timeline |
 

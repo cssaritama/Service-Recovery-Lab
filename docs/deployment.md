@@ -22,7 +22,7 @@ Everything below uses free plans. Nothing requires a credit card.
    npx wrangler d1 create service-recovery-lab-db
    ```
    Copy each `database_id` (UUID).
-4. Create an **API token**: *My Profile → API Tokens → Create Token → "Edit Cloudflare Workers"* template, then add the permission **Account → D1 → Edit**. Copy the token.
+4. Create an **API token**: *My Profile → API Tokens → Create Token → "Edit Cloudflare Workers"* template. Add the permissions **Account → D1 → Edit** and **Account → Workers AI → Read**, then copy the token.
 
 ## 2. GitHub environments (≈ 5 min)
 
@@ -37,6 +37,15 @@ For **each** environment, add:
 | Variable | `CLOUDFLARE_D1_DATABASE_ID` | Dev database UUID | Prod database UUID |
 | Variable | `CLOUDFLARE_WORKER_NAME` | `service-recovery-lab-dev` | `service-recovery-lab` |
 | Variable | `DEPLOYMENT_URL` | `https://service-recovery-lab-dev.<subdomain>.workers.dev` | `https://service-recovery-lab.<subdomain>.workers.dev` |
+
+Optional repository or environment variables:
+
+| Name | Effect |
+|---|---|
+| `ENABLE_WORKERS_AI` | `false` deploys without the Workers AI adviser (it is on by default) |
+| `WORKERS_AI_MODEL` | Another Workers AI text model ID |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Push telemetry live to an OTLP/HTTP backend, for example Grafana Cloud's free tier |
+| Secret `OTEL_EXPORTER_OTLP_HEADERS` | Authentication headers for that backend, stored as a Worker secret |
 
 Your `<subdomain>` is shown under *Workers & Pages → Overview* (it is your `*.workers.dev` subdomain).
 
