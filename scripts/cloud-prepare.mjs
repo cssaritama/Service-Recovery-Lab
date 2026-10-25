@@ -23,6 +23,8 @@ config.d1_databases = [
   },
 ];
 config.vars = { BUILD_REVISION: process.env.GITHUB_SHA || 'manual', DEPLOYMENT_STAGE: stage };
+if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT)
+  config.vars.OTEL_EXPORTER_OTLP_ENDPOINT = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 // Workers AI gives the on-call agent a language-model second opinion on the free daily
 // allocation. Set ENABLE_WORKERS_AI=false to deploy with the deterministic policy only.
 if (process.env.ENABLE_WORKERS_AI !== 'false') {

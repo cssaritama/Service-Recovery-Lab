@@ -11,6 +11,7 @@ import {
 import { Repository, RepoError, hashToken, newToken, type Database } from './repository.ts';
 import { respond } from './agent.ts';
 import { selectAdvisor, type WorkersAI } from './advisers.ts';
+import { exportAttempt, toOtlp } from './otel.ts';
 export interface Environment {
   DB: Database;
   AI?: WorkersAI;
@@ -18,6 +19,9 @@ export interface Environment {
   OLLAMA_URL?: string;
   OLLAMA_MODEL?: string;
   BUILD_REVISION?: string;
+  DEPLOYMENT_STAGE?: string;
+  OTEL_EXPORTER_OTLP_ENDPOINT?: string;
+  OTEL_EXPORTER_OTLP_HEADERS?: string;
 }
 export interface Context {
   waitUntil(promise: Promise<unknown>): void;
@@ -105,6 +109,18 @@ export async function handleApi(
           : {},
       );
     }
+    if (request.method === 'GET' && path === '/api/telemetry/otlp') {
+      const s = await repo.read(current.id);
+      return reply(
+        {
+          format: 'otlp-json',
+          note: 'POST each section to <collector>/v1/traces, /v1/logs and /v1/metrics',
+          ...toOtlp(s, s.traces, env.DEPLOYMENT_STAGE || 'local'),
+        },
+        200,
+        { 'content-disposition': 'attachment; filename="journey-telemetry.otlp.json"' },
+      );
+    }
     if (request.method !== 'POST') return reply({ error: 'not_found' }, 404);
     const body = await parse(request);
     if (path === '/api/drills') {
@@ -125,6 +141,9 @@ export async function handleApi(
       const { state } = await repo.mutate(current.id, s =>
         recordAttempt(s, result, probe, tid, performance.now() - started),
       );
+      const attempt = state.traces.at(-1);
+      if (attempt?.traceId === tid && env.OTEL_EXPORTER_OTLP_ENDPOINT)
+        ctx.waitUntil(exportAttempt(env, state, attempt).catch(() => {}));
       console.log(
         JSON.stringify({
           event: 'reservation.completed',

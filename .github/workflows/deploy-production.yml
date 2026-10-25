@@ -18,6 +18,7 @@ jobs:
       CLOUDFLARE_WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME }}
       ENABLE_WORKERS_AI: ${{ vars.ENABLE_WORKERS_AI }}
       WORKERS_AI_MODEL: ${{ vars.WORKERS_AI_MODEL }}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${{ vars.OTEL_EXPORTER_OTLP_ENDPOINT }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -30,6 +31,13 @@ jobs:
       - run: npm run cloud:prepare -- production
       - run: npx wrangler d1 migrations apply DB --remote --config dist/server/wrangler.production.json
       - run: npx wrangler deploy --config dist/server/wrangler.production.json
+      - name: Configure OpenTelemetry export (optional)
+        if: env.OTEL_EXPORTER_OTLP_ENDPOINT != ''
+        env:
+          OTEL_HEADERS: ${{ secrets.OTEL_EXPORTER_OTLP_HEADERS }}
+        run: |
+          [ -n "$OTEL_HEADERS" ] || exit 0
+          printf '%s' "$OTEL_HEADERS" | npx wrangler secret put OTEL_EXPORTER_OTLP_HEADERS --config dist/server/wrangler.production.json
       - run: npm run smoke
         env:
           BASE_URL: ${{ vars.DEPLOYMENT_URL }}

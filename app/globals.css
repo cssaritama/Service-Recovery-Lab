@@ -1244,3 +1244,11 @@ td {
     transition: none !important;
   }
 }
+
+.heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}

@@ -1,0 +1,18 @@
+# Optional observability stack: OpenTelemetry collector + Grafana (Tempo traces, Loki logs,
+# Prometheus metrics) in one container.
+#   docker compose -f compose.yaml -f compose.observability.yaml up --build
+# App: http://localhost:3000 · Grafana: http://localhost:3001 (Explore → Tempo / Loki / Prometheus)
+services:
+  app:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
+    depends_on:
+      - lgtm
+  lgtm:
+    image: grafana/otel-lgtm:0.8.1
+    ports:
+      - '${SRL_GRAFANA_PORT:-3001}:3000'
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    restart: unless-stopped

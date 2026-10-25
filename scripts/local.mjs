@@ -13,7 +13,14 @@ const source = JSON.parse(readFileSync('dist/server/wrangler.json', 'utf8'));
 source.vars = {
   ...source.vars,
   ...Object.fromEntries(
-    ['OLLAMA_URL', 'OLLAMA_MODEL', 'BUILD_REVISION']
+    [
+      'OLLAMA_URL',
+      'OLLAMA_MODEL',
+      'BUILD_REVISION',
+      'DEPLOYMENT_STAGE',
+      'OTEL_EXPORTER_OTLP_ENDPOINT',
+      'OTEL_EXPORTER_OTLP_HEADERS',
+    ]
       .filter(key => process.env[key])
       .map(key => [key, process.env[key]]),
   ),
