@@ -11,7 +11,7 @@ npm test
 `npm test` ([`scripts/test.mjs`](../scripts/test.mjs)) runs four stages in order and exits non-zero on the first failure:
 
 1. **Typecheck:** `tsc --noEmit`
-2. **Unit and integration:** Node.js built-in test runner. Results go to stdout and to `test-results/unit-integration.xml` (JUnit).
+2. **Unit, adviser, OpenTelemetry and integration:** Node.js built-in test runner (33 tests). Results go to stdout and to `test-results/unit-integration.xml` (JUnit).
 3. **Production build:** `vinext build`
 4. **Browser tests:** Playwright starts the production build on port 4317 against an isolated test database. Results go to `test-results/browser.xml` and `playwright-report/`.
 
@@ -33,6 +33,27 @@ Pure domain rules, no I/O.
 | successful attempts reset the failure streak; telemetry is bounded | Streak reset; at most 120 traces kept |
 | manual restore is never counted as agent recovery | Status `cancelled`, recoveries = 0 |
 | probe inventory is separate and bounded | Probes never reduce customer capacity; budget of 80 |
+
+### Model-adviser tests: `tests/advisers.test.mjs` (7)
+
+| Test | Guarantees |
+|---|---|
+| adviser output is reduced to exactly one allowlisted action | JSON, prose and ambiguous outputs; shell-like or unknown actions are rejected |
+| Workers AI adviser sends only the three booleans and parses the answer | Prompt contents, model ID, temperature 0 |
+| a slow or malformed model answer is rejected | Timeout and invalid output |
+| adviser selection | Workers AI → Ollama → deterministic policy only |
+| alert → Workers AI agrees → verified recovery, reasoner recorded | End-to-end through the API with a stub AI binding |
+| alert → Workers AI proposes a different repair → escalation | No configuration change, recoveries = 0 |
+| alert → Workers AI unavailable → escalation | Quota or outage never leads to guessing |
+
+### OpenTelemetry tests: `tests/otel.test.mjs` (4)
+
+| Test | Guarantees |
+|---|---|
+| span, log and metric exemplar share the same trace and span IDs | OTLP field formats (32- and 16-hex IDs, nanosecond strings, span kind, status, severity) |
+| header list parsing | `OTEL_EXPORTER_OTLP_HEADERS` convention |
+| export skipped without endpoint, never throws when the collector is down | Best-effort export |
+| each booking is pushed to an OTLP/HTTP collector without payloads | A real HTTP collector receives `/v1/traces`, `/v1/logs` and `/v1/metrics` with auth headers; no payload or cookie leaks; `/api/telemetry/otlp` download requires a session |
 
 ### Integration tests: `tests/integration.test.mjs` (13)
 These run the real API handler against a **real SQLite database** created from the production migration (`tests/sqlite-adapter.mjs`), plus one test over a real HTTP server.
@@ -77,5 +98,9 @@ It checks health, books, injects a fault, asserts three 503s, waits for the agen
 |---|---|---|
 | 2026-10-25 | Owner's Windows 11 laptop, Node 24 (implementation session) | Production-build walkthrough (`scripts/capture-demo.mjs`) completed with a verified recovery and zero page errors. It produced the screenshots, video, `evidence/example-recovery.json`, `evidence/browser-console.json` and `evidence/performance.json`. |
 | 2026-10-25 | Clean Linux checkout, Node 22, Chromium (independent verification session) | Typecheck passed · **22/22** unit + integration · build passed · **4/4** browser · smoke test passed against `npm run local` · ESLint clean |
+
+After the agent and telemetry additions: **33/33** unit, adviser, OpenTelemetry and integration tests and **4/4** browser tests passed; Prettier and ESLint were clean. Live OTLP export was checked against the real runtime: the six requests of the smoke test produced six traces, six logs and six metrics at a local collector.
+
+A second run on the same day covered the container. After the runtime-permission fix, the runtime image started as a non-root user with a persistent volume, became *healthy*, passed the smoke test and survived a restart.
 
 The independent run found one real defect: horizontal overflow of the mobile navigation on narrow screens with wider system fonts. It was fixed in `app/globals.css`, and the mobile test now passes on both platforms. See [agent-work-log.md](agent-work-log.md).

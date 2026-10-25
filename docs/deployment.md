@@ -22,7 +22,7 @@ Everything below uses free plans. Nothing requires a credit card.
    npx wrangler d1 create service-recovery-lab-db
    ```
    Copy each `database_id` (UUID).
-4. Create an **API token**: *My Profile → API Tokens → Create Token → "Edit Cloudflare Workers"* template, then add the permission **Account → D1 → Edit**. Copy the token.
+4. Create an **API token**: *My Profile → API Tokens → Create Token → "Edit Cloudflare Workers"* template. Add the permissions **Account → D1 → Edit** and **Account → Workers AI → Read**, then copy the token.
 
 ## 2. GitHub environments (≈ 5 min)
 
@@ -38,7 +38,18 @@ For **each** environment, add:
 | Variable | `CLOUDFLARE_WORKER_NAME` | `service-recovery-lab-dev` | `service-recovery-lab` |
 | Variable | `DEPLOYMENT_URL` | `https://service-recovery-lab-dev.<subdomain>.workers.dev` | `https://service-recovery-lab.<subdomain>.workers.dev` |
 
+Optional repository or environment variables:
+
+| Name | Effect |
+|---|---|
+| `ENABLE_WORKERS_AI` | `false` deploys without the Workers AI adviser (it is on by default) |
+| `WORKERS_AI_MODEL` | Another Workers AI text model ID |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Push telemetry live to an OTLP/HTTP backend, for example Grafana Cloud's free tier |
+| Secret `OTEL_EXPORTER_OTLP_HEADERS` | Authentication headers for that backend, stored as a Worker secret |
+
 Your `<subdomain>` is shown under *Workers & Pages → Overview* (it is your `*.workers.dev` subdomain).
+
+Finally, under *Settings → Secrets and variables → Actions → Variables* (repository level), add `DEPLOY_ENABLED` = `true`. Until this variable exists, the development deployment is skipped instead of failing, so CI stays green before the cloud is configured.
 
 On the **production** environment, enable **Required reviewers** and add yourself. This makes the production promotion an explicit human approval.
 
@@ -70,4 +81,4 @@ Links worth keeping for reviewers:
 | `Set CLOUDFLARE_D1_DATABASE_ID for this environment.` | The variable is missing or is not a UUID in that GitHub environment |
 | `Authentication error [code: 10000]` | The token lacks *Workers Scripts: Edit* or *D1: Edit* |
 | Smoke test `Process health failed` | `DEPLOYMENT_URL` is wrong, or it is the first deploy and the `workers.dev` route is still propagating. Re-run the job after a minute. |
-| Deploy development did not start | It only runs after *Quality gate* succeeds on a **push** to `main` (not on pull requests) |
+| Deploy development did not start | It only runs after *Quality gate* succeeds on a **push** to `main` (not on pull requests), and only when the repository variable `DEPLOY_ENABLED` is `true` |

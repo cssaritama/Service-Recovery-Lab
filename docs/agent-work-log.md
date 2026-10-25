@@ -73,3 +73,50 @@ A different agent and tool, with no access to the implementer's context, reviewe
 2. Run `node scripts/sync-tracker-issues.mjs`.
 3. Configure the Cloudflare environments (`docs/deployment.md`) and add the live URL to the README.
 4. Complete the three required peer reviews.
+
+## 2026-10-25 — SRL-06 container failure and template cleanup (Verification and Delivery agent, Claude)
+
+**Trigger:** the first GitHub run of *Quality gate* (commit `2766dae`). The `verify` job passed (tests). The `container` job failed at `docker compose up --wait`.
+
+**Root cause.** In the runtime stage, `WORKDIR /app` creates `/app` owned by root. `COPY --chown=node:node` changes only the copied contents, not `/app` itself. At startup the app runs as the `node` user and needs to create a directory in `/app`. That fails with `EACCES: permission denied, mkdir '/app/.sites-runtime/wrangler'`, so the container exits immediately.
+
+**How it was reproduced:** in a locally built runtime image (Docker Hub is not reachable from the review environment). The image runs as `node` with a named volume, exactly like `compose.yaml`.
+
+**Fix:** `chown node:node /app /app/data` in the `Dockerfile`.
+
+**Verification:** without the fix the container exits with the error above. With it, the container is *healthy*, `scripts/smoke.mjs` passes (booking, alert, verified recovery, reservation preserved) and the data survives `docker restart`.
+
+**Template cleanup.** The project had been scaffolded from a hosted-site starter. Its unused parts were removed after confirming that nothing imported them:
+- 61 UI components, a sign-in helper, connector preview plumbing, a hosting manifest, a vendored Vite plugin, package-manager installer scripts, an example app and an unused `db/index.ts`.
+- 20 unused dependencies (690 → 509 installed packages).
+
+`vite.config.ts` and `worker/index.ts` now contain only the Cloudflare D1 binding and the API routing. This supersedes the earlier restoration of `.openai/hosting.json`, which is no longer needed.
+
+**Deployment guard.** `deploy-development.yml` now runs only when the repository variable `DEPLOY_ENABLED` is `true`. Until the owner configures Cloudflare, CI stays green instead of failing on missing credentials.
+
+**Checks after the changes:** `npm test` exit 0 (22/22 unit + integration, 4/4 browser), `tsc` clean, ESLint clean.
+
+SRL-06 stays **in progress** until the container job is green on GitHub.
+
+## 2026-10-25 — Owner-requested improvements: readability, AI adviser, OpenTelemetry, positioning (Delivery agent, Claude)
+
+**Owner request:**
+- make the code read as maintained source;
+- give the on-call agent a real language model in the public demo;
+- strengthen observability with an industry standard;
+- reposition the README for executive readers.
+
+**Changes and verification:**
+
+1. **Prettier** is the single code style, with `format:check` and `lint` enforced in CI. No behaviour change; the full suite passed.
+2. **Workers AI adviser** (`lib/recovery/advisers.ts`). The cloud deployment binds `AI` and asks `@cf/meta/llama-3.1-8b-instruct` for a second opinion on three booleans. Outputs are parsed into one allowlisted action, and any disagreement, malformed output or timeout escalates. The timeline records the model and its proposal.
+   - 7 tests in `tests/advisers.test.mjs`, end-to-end paths included.
+   - `wrangler deploy --dry-run` confirmed the `env.AI` binding.
+   - Not verified here: a live Workers AI call. It needs the owner's Cloudflare account.
+3. **OpenTelemetry** (`lib/recovery/otel.ts`): OTLP/JSON spans, logs and metrics with exemplars, `/api/telemetry/otlp`, optional live export, and `compose.observability.yaml` with Grafana LGTM.
+   - 4 tests in `tests/otel.test.mjs`, including a real HTTP collector.
+   - Checked against workerd: 6 requests produced 6 traces, 6 logs and 6 metrics.
+   - Not verified here: pulling `grafana/otel-lgtm`, because Docker Hub is blocked in this environment.
+4. **README** rewritten around the executive questions, the operating principles and the human-led agent model. The course context moved to a reviewer section.
+
+**Result:** `npm test` exit 0 (33/33 and 4/4), Prettier and ESLint clean.
