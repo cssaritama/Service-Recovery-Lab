@@ -23,6 +23,12 @@ config.d1_databases = [
   },
 ];
 config.vars = { BUILD_REVISION: process.env.GITHUB_SHA || 'manual', DEPLOYMENT_STAGE: stage };
+// Workers AI gives the on-call agent a language-model second opinion on the free daily
+// allocation. Set ENABLE_WORKERS_AI=false to deploy with the deterministic policy only.
+if (process.env.ENABLE_WORKERS_AI !== 'false') {
+  config.ai = { binding: 'AI' };
+  if (process.env.WORKERS_AI_MODEL) config.vars.WORKERS_AI_MODEL = process.env.WORKERS_AI_MODEL;
+}
 const path = `dist/server/wrangler.${stage}.json`;
 writeFileSync(path, JSON.stringify(config, null, 2) + '\n');
 console.log(`Prepared ${path}. Credentials remain in environment variables.`);

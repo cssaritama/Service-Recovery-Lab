@@ -10,6 +10,7 @@ for (const args of [
     '--test-reporter=junit',
     '--test-reporter-destination=test-results/unit-integration.xml',
     'tests/domain.test.mjs',
+    'tests/advisers.test.mjs',
     'tests/integration.test.mjs',
   ],
   ['node_modules/vinext/dist/cli.js', 'build'],

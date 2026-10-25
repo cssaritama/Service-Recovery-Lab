@@ -9,9 +9,12 @@ import {
   uuid,
 } from './domain.ts';
 import { Repository, RepoError, hashToken, newToken, type Database } from './repository.ts';
-import { respond, type Advisor } from './agent.ts';
+import { respond } from './agent.ts';
+import { selectAdvisor, type WorkersAI } from './advisers.ts';
 export interface Environment {
   DB: Database;
+  AI?: WorkersAI;
+  WORKERS_AI_MODEL?: string;
   OLLAMA_URL?: string;
   OLLAMA_MODEL?: string;
   BUILD_REVISION?: string;
@@ -132,31 +135,7 @@ export async function handleApi(
         }),
       );
       if (state.incident?.status === 'alerted') {
-        const advisor: Advisor | undefined = env.OLLAMA_URL
-          ? async observation => {
-              const response = await fetch(new URL('/api/chat', env.OLLAMA_URL), {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                signal: AbortSignal.timeout(20000),
-                body: JSON.stringify({
-                  model: env.OLLAMA_MODEL || 'qwen2.5:0.5b',
-                  stream: false,
-                  format: 'json',
-                  messages: [
-                    {
-                      role: 'system',
-                      content:
-                        'Choose exactly one action: restore_catalog, resume_adapter, escalate. Unknown dependency must escalate. Return JSON {"action":"..."}. Never suggest code.',
-                    },
-                    { role: 'user', content: JSON.stringify(observation) },
-                  ],
-                }),
-              });
-              if (!response.ok) throw new Error('reasoner_unavailable');
-              const output = (await response.json()) as { message: { content: string } };
-              return JSON.parse(output.message.content).action;
-            }
-          : undefined;
+        const advisor = selectAdvisor(env);
         ctx.waitUntil(
           respond(
             repo,

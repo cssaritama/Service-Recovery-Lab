@@ -1,11 +1,13 @@
 import { serviceFault, step, uuid, type State } from './domain.ts';
 import { Repository } from './repository.ts';
 export type Probe = (negative: boolean) => Promise<{ status: number; reservationId?: string }>;
-export type Advisor = (observation: {
+export interface Observation {
   catalogAvailable: boolean;
   adapterReady: boolean;
   unknownDependency: boolean;
-}) => Promise<string>;
+}
+/** A language-model second opinion. It can only confirm the policy decision, never widen it. */
+export type Advisor = ((observation: Observation) => Promise<string>) & { label?: string };
 export function diagnose(s: State): 'restore_catalog' | 'resume_adapter' | 'escalate' {
   const fault = serviceFault(s);
   return fault === 'catalog_unavailable'
@@ -32,20 +34,22 @@ export async function respond(repo: Repository, id: string, probe: Probe, adviso
   });
   if (!claim.result) return;
   const observed = claim.state;
-  let decision: string = diagnose(observed),
+  const policy = diagnose(observed);
+  let decision: string = policy,
     reasoner = 'bounded-policy';
   if (advisor) {
-    reasoner = 'model-advised';
+    let proposed = 'no valid answer';
     try {
-      const proposed = await advisor({
+      proposed = await advisor({
         catalogAvailable: observed.config.catalog === 'catalog-v1',
         adapterReady: observed.config.adapter === 'ready',
         unknownDependency: observed.config.unknownFault,
       });
-      if (proposed !== decision) decision = 'escalate';
     } catch {
-      decision = 'escalate';
+      /* An unavailable or malformed adviser is treated as disagreement. */
     }
+    if (proposed !== policy) decision = 'escalate';
+    reasoner = `model-advised (${advisor.label ?? 'language model'} proposed ${proposed}; policy selected ${policy})`;
   }
   const repaired = await repo.mutate(id, s => {
     const i = s.incident;
