@@ -520,11 +520,19 @@ export default function Home() {
                       <span className="eyebrow">COLLECTED AND STORED</span>
                       <h2>Reservation request traces</h2>
                     </div>
-                    <span className="badge neutral">{s.traces.length} retained</span>
+                    <div className="heading-actions">
+                      <span className="badge neutral">{s.traces.length} retained</span>
+                      <a className="text-button" href="/api/telemetry/otlp">
+                        <ArrowDownToLine size={13} />
+                        OpenTelemetry (OTLP)
+                      </a>
+                    </div>
                   </div>
                   <p className="section-description">
                     Select a request to correlate its span, log and metric. The latest 120 traces
-                    are retained. Cookies, credentials and request payloads are excluded.
+                    are retained and can be downloaded in OpenTelemetry format; when a collector is
+                    configured, each request is also exported live. Cookies, credentials and request
+                    payloads are excluded.
                   </p>
                   {!s.traces.length ? (
                     <div className="empty muted">

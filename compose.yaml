@@ -11,6 +11,9 @@ services:
       SRL_STATE_DIR: /app/data
       OLLAMA_URL: '${OLLAMA_URL:-}'
       OLLAMA_MODEL: '${OLLAMA_MODEL:-qwen2.5:0.5b}'
+      DEPLOYMENT_STAGE: docker
+      OTEL_EXPORTER_OTLP_ENDPOINT: '${OTEL_EXPORTER_OTLP_ENDPOINT:-}'
+      OTEL_EXPORTER_OTLP_HEADERS: '${OTEL_EXPORTER_OTLP_HEADERS:-}'
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     volumes:

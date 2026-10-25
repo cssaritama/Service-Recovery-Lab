@@ -5,3 +5,9 @@ OLLAMA_URL=
 OLLAMA_MODEL=qwen2.5:0.5b
 # With an Ollama server on your host, Docker can use:
 # OLLAMA_URL=http://host.docker.internal:11434
+
+# Optional OpenTelemetry export (OTLP/HTTP). Leave blank to keep telemetry in the app only.
+# compose.observability.yaml sets this to its bundled Grafana stack automatically.
+OTEL_EXPORTER_OTLP_ENDPOINT=
+# Comma-separated key=value pairs, for example a vendor API key (values may be URL-encoded).
+OTEL_EXPORTER_OTLP_HEADERS=
