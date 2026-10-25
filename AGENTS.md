@@ -12,7 +12,7 @@ Service Recovery Lab is a full-stack reservation service (React UI → Cloudflar
 | Writing or running tests | [Testing](docs/testing.md) |
 | Working on alerts, telemetry, the responder or rollback | [Operations](docs/operations.md) |
 | Working on CI/CD or cloud environments | [Deployment](docs/deployment.md) |
-| Preparing the submission | [Rubric evidence](docs/rubric-evidence.md) |
+| Reviewing the project end to end | [Reviewer guide](docs/reviewer-guide.md) |
 
 ## Working rules
 

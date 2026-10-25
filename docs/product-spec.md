@@ -29,4 +29,4 @@ Happy-path reservation; sold-out slot; invalid input; idempotent retry; key/payl
 
 Technical success means independently reproducible booking and recovery behavior with passing tests and inspectable evidence. This is not measured customer savings, adoption, broad cyber resilience, or a validated investment opportunity. Recovery objectives are lab observations, not production SLO claims. Market differentiation and willingness to pay remain unvalidated.
 
-The course rubric tops out at 24 points. Assessment and three required peer reviews remain external requirements. Configuration files are not evidence of successful cloud or CI runs.
+Configuration files are not evidence of successful cloud or CI runs.

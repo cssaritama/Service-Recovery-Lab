@@ -74,8 +74,6 @@ Or without Docker (Node.js 24+): `npm ci && npm run local`.
 |---|---|---|
 | ![](docs/screenshots/workspace.png) | ![](docs/screenshots/telemetry.png) | ![](docs/screenshots/mobile.png) |
 
-**Live demo:** _public URL added after the first cloud deployment ([docs/deployment.md](docs/deployment.md))._
-
 ---
 
 ## The problem in detail
@@ -196,7 +194,7 @@ evidence/              demo recording, evidence export, benchmark, console check
 
 ## For reviewers
 
-This repository is also my capstone for the [AI Dev Tools Zoomcamp](https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/tree/main/project) (DataTalks.Club). The criterion-by-criterion evidence, with files, commands and tests, is in **[docs/rubric-evidence.md](docs/rubric-evidence.md)**, and [AGENTS.md](AGENTS.md) is the entry point for the agent context. All documentation is in English and all data is synthetic.
+This repository is also my capstone for the [AI Dev Tools Zoomcamp](https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/tree/main/project) (DataTalks.Club). The criterion-by-criterion evidence, with files, commands and tests, is in **[docs/reviewer-guide.md](docs/reviewer-guide.md)**, and [AGENTS.md](AGENTS.md) is the entry point for the agent context. All documentation is in English and all data is synthetic.
 
 ## Author
 

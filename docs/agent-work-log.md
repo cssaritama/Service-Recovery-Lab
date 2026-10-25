@@ -6,15 +6,15 @@ This log records what each agent session actually did and verified. Entries are 
 
 ## 2026-10-24 → 2026-10-25 — Topic research and selection (Product agent, session A)
 
-The owner provided the course rubric and the public portfolio (`github.com/cssaritama`) and asked for a project distinct from existing portfolio work.
+The owner provided the delivery criteria and the public portfolio (`github.com/cssaritama`) and asked for a project distinct from existing portfolio work.
 
 The agent researched and compared about fifteen candidate topics, including invoice exception resolution, heat-shelter access planning, AI-agent action control, IT-asset reuse, packaging data quality and public-procurement review. Several were rejected because established products already cover them or because data access was not realistic in the time available. The research notes stayed in the owner's planning workspace and are not part of this repository.
 
-The owner delegated the final choice. The agent selected **business-service recovery with journey-level evidence** because it exercises every rubric area (alerting, on-call agent, CI/CD and rollback) as part of the product itself rather than as add-ons.
+The owner delegated the final choice. The agent selected **business-service recovery with journey-level evidence** because it exercises every delivery area (alerting, on-call agent, CI/CD and rollback) as part of the product itself rather than as add-ons.
 
 ## 2026-10-25 — SRL-01 / SRL-02 (Product → Implementation agent, session A)
 
-The agent read the course rubric, created the frontend starter, and wrote `docs/product-spec.md` and the tracker acceptance criteria **before** domain implementation.
+The agent read the delivery criteria, created the frontend starter, and wrote `docs/product-spec.md` and the tracker acceptance criteria **before** domain implementation.
 
 Read: `AGENTS.md`, `docs/product-spec.md`, `public/tracker.json`. SRL-01 was marked done and SRL-02 moved to in progress.
 
@@ -61,7 +61,7 @@ A different agent and tool, with no access to the implementer's context, reviewe
 3. *Lint.* Internal links were changed to `next/link`. The polling effect's intentional dependency list is now annotated.
 4. *Documentation gaps.* The README was still the starter template, and `AGENTS.md` linked to four documents that did not exist.
 
-**Added:** `README.md` (rewritten), `docs/architecture.md`, `docs/agent-team.md`, `docs/testing.md`, `docs/operations.md`, `docs/deployment.md`, `docs/rubric-evidence.md`, `scripts/sync-tracker-issues.mjs`, `LICENSE`, `.nvmrc`, GitHub issue and PR templates.
+**Added:** `README.md` (rewritten), `docs/architecture.md`, `docs/agent-team.md`, `docs/testing.md`, `docs/operations.md`, `docs/deployment.md`, `docs/reviewer-guide.md`, `scripts/sync-tracker-issues.mjs`, `LICENSE`, `.nvmrc`, GitHub issue and PR templates.
 
 **Tracker updates:**
 - SRL-02, SRL-03, SRL-04 and SRL-05 → **done**. Each criterion is backed by a passing test or artifact listed in the task's `evidence` field.
@@ -72,7 +72,6 @@ A different agent and tool, with no access to the implementer's context, reviewe
 1. Push to GitHub and confirm the *Quality gate* run.
 2. Run `node scripts/sync-tracker-issues.mjs`.
 3. Configure the Cloudflare environments (`docs/deployment.md`) and add the live URL to the README.
-4. Complete the three required peer reviews.
 
 ## 2026-10-25 — SRL-06 container failure and template cleanup (Verification and Delivery agent, session B)
 
@@ -117,6 +116,6 @@ SRL-06 stays **in progress** until the container job is green on GitHub.
    - 4 tests in `tests/otel.test.mjs`, including a real HTTP collector.
    - Checked against workerd: 6 requests produced 6 traces, 6 logs and 6 metrics.
    - Not verified here: pulling `grafana/otel-lgtm`, because Docker Hub is blocked in this environment.
-4. **README** rewritten around the executive questions, the operating principles and the human-led agent model. The course context moved to a reviewer section.
+4. **README** rewritten around the executive questions, the operating principles and the human-led agent model. Reviewer material moved to a dedicated section.
 
 **Result:** `npm test` exit 0 (33/33 and 4/4), Prettier and ESLint clean.

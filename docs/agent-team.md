@@ -8,7 +8,7 @@ A separate, **runtime** agent (the on-call responder) is part of the product its
 
 | Role | Performed by | Responsibilities | Inputs | Outputs | Done when |
 |---|---|---|---|---|---|
-| **Owner** | Human (repository owner) | Sets goals and constraints: course rubric, zero budget, English, synthetic data. Chooses the topic. Approves scope and releases. Operates accounts: GitHub, Cloudflare, peer reviews. | Course requirements, portfolio goals | Decisions, approvals, credentials (never shared with agents) | Release approved |
+| **Owner** | Human (repository owner) | Sets goals and constraints: delivery criteria, zero budget, English, synthetic data. Chooses the topic. Approves scope and releases. Operates accounts: GitHub, Cloudflare, peer reviews. | Course requirements, portfolio goals | Decisions, approvals, credentials (never shared with agents) | Release approved |
 | **Product agent** | Coding agent | Research and topic evaluation. Writes the problem statement, specification and acceptance scenarios **before** domain code. Creates tracker tasks. | Owner goals | `docs/product-spec.md`, `public/tracker.json` | Every task has observable acceptance criteria |
 | **Implementation agent** | Coding agent | Builds the domain, API, persistence, responder and UI against one tracker task at a time. | Spec, tracker task, `AGENTS.md` | Source code, migrations | Task criteria demonstrably met |
 | **Verification agent** | Coding agent (independent session from implementation where possible) | Writes and runs unit, integration and browser tests. Reviews the code against the spec. Reports defects back to implementation. | Spec, code | `tests/`, test results, defect list | All tests pass in one command; defects fixed or recorded |
@@ -25,7 +25,7 @@ flowchart LR
   V -->|defects| I
   V -->|passing build| D[Delivery agent]
   D -->|package and evidence| O
-  O -->|merge, deploy prod, peer review| R[(Release)]
+  O -->|merge, deploy prod| R[(Release)]
 ```
 
 1. **Spec first.** No domain code before `docs/product-spec.md` and the tracker tasks exist. A behaviour change that is not in the spec starts with a spec update.
@@ -33,7 +33,7 @@ flowchart LR
 3. **Evidence over assertion.** A status change must be backed by a test, a command output or a file in `evidence/`. Configuration files do not count as proof that a deployment ran.
 4. **Separation of build and review.** The verification role runs from a fresh context (it re-reads the spec, not the implementer's notes) so the work is not graded by its author. In this project the final verification was performed by a different agent and tool than the implementation; see the work log.
 5. **Logged hand-offs.** Each session appends what it read, changed and verified to `docs/agent-work-log.md`, including failures.
-6. **Human gates.** The owner alone holds credentials, approves the production environment, merges to `main` and completes peer reviews.
+6. **Human gates.** The owner alone holds credentials, approves the production environment and merges to `main`.
 
 ## Agent rules (enforced through `AGENTS.md`)
 

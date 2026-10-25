@@ -10,7 +10,7 @@ export default function Tracker() {
         This tracker predates domain implementation. Each task defines observable acceptance
         criteria and moves to done only when they are verified. Roles and hand-offs are described in
         docs/agent-team.md; the history of each change is in docs/agent-work-log.md. Status reflects
-        recorded work, not a course grade.
+        recorded work, not an external assessment.
       </p>
       {tracker.tasks.map(t => (
         <article className="panel" key={t.id}>

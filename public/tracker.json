@@ -101,13 +101,13 @@
       "status": "in_progress",
       "acceptance": [
         "Deployment result documented",
-        "English documentation and rubric matrix",
+        "English documentation and reviewer guide",
         "ZIP contains source, lockfile and evidence without secrets",
         "Remaining owner actions explicitly stated"
       ],
       "agent": "Delivery agent",
       "evidence": [
-        "README.md, docs/rubric-evidence.md, docs/deployment.md",
+        "README.md, docs/reviewer-guide.md, docs/deployment.md",
         "Remaining: public URL after Cloudflare deployment (owner account)"
       ]
     }

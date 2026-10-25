@@ -1,4 +1,4 @@
-# Reviewer guide: evaluation criteria and evidence
+# Reviewer guide: capabilities and evidence
 
 This guide maps every criterion of the [AI Dev Tools Zoomcamp final project](https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/tree/main/project) to concrete files, commands and tests, so each claim can be checked in a few minutes.
 

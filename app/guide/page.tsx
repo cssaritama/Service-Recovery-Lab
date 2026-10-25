@@ -88,8 +88,8 @@ export default function Guide() {
         <p>
           Read the <a href="/tracker">public task tracker</a>. The source package includes
           specifications, architecture decisions, tests, containers, CI/CD workflows, rollback
-          instructions, agent work logs and the rubric matrix. GitHub runs and required peer reviews
-          must be completed through the owner’s accounts. The grade is a reviewer decision.
+          instructions, agent work logs and a reviewer guide that maps each capability to its
+          evidence.
         </p>
       </section>
     </main>
