@@ -1,18 +1,47 @@
-import {chromium,expect} from '@playwright/test';
-import {mkdirSync,writeFileSync,copyFileSync} from 'node:fs';
-mkdirSync('docs/screenshots',{recursive:true});mkdirSync('evidence',{recursive:true});mkdirSync('test-results/demo',{recursive:true});
-const browser=await chromium.launch();const context=await browser.newContext({viewport:{width:1440,height:1100},recordVideo:{dir:'test-results/demo',size:{width:1440,height:1100}}});
-const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
-await page.goto(process.env.BASE_URL||'http://127.0.0.1:3000');await page.getByRole('button',{name:'Reserve appointment'}).waitFor();
-await page.getByRole('button',{name:'Reserve appointment'}).click();await page.getByText('Reservation confirmed and saved.',{exact:true}).waitFor();
-await page.getByRole('button',{name:'Dismiss message'}).click();await page.screenshot({path:'docs/screenshots/workspace.png',fullPage:true});
-await page.getByRole('button',{name:'Run guided recovery drill'}).click();await page.getByText('Recovery independently checked',{exact:true}).waitFor({timeout:45000});
-await expect(page.getByRole('button',{name:'Run guided recovery drill'})).toBeEnabled();
-await page.getByRole('button',{name:'Dismiss message'}).click();await page.screenshot({path:'docs/screenshots/recovery.png',fullPage:true});
-const evidence=await(await page.request.get(new URL('/api/evidence',page.url()).toString())).json();writeFileSync('evidence/example-recovery.json',JSON.stringify(evidence,null,2)+'\n');
-await page.getByRole('button',{name:'Journey telemetry'}).click();await page.locator('.trace-link').first().click();await page.screenshot({path:'docs/screenshots/telemetry.png',fullPage:true});
-await page.getByRole('button',{name:'Recovery workspace'}).click();await page.setViewportSize({width:390,height:844});await page.screenshot({path:'docs/screenshots/mobile.png',fullPage:true});
-const video=page.video();await context.close();if(video)copyFileSync(await video.path(),'evidence/local-demo.webm');await browser.close();
-writeFileSync('evidence/browser-console.json',JSON.stringify({pageErrors:errors,scope:'local production build walkthrough'},null,2)+'\n');
-if(errors.length)process.exitCode=1;
-console.log(JSON.stringify({screenshots:4,recovery:evidence.incident.status,pageErrors:errors.length}));
+import { chromium, expect } from '@playwright/test';
+import { mkdirSync, writeFileSync, copyFileSync } from 'node:fs';
+mkdirSync('docs/screenshots', { recursive: true });
+mkdirSync('evidence', { recursive: true });
+mkdirSync('test-results/demo', { recursive: true });
+const browser = await chromium.launch();
+const context = await browser.newContext({
+  viewport: { width: 1440, height: 1100 },
+  recordVideo: { dir: 'test-results/demo', size: { width: 1440, height: 1100 } },
+});
+const page = await context.newPage();
+const errors = [];
+page.on('pageerror', e => errors.push(e.message));
+await page.goto(process.env.BASE_URL || 'http://127.0.0.1:3000');
+await page.getByRole('button', { name: 'Reserve appointment' }).waitFor();
+await page.getByRole('button', { name: 'Reserve appointment' }).click();
+await page.getByText('Reservation confirmed and saved.', { exact: true }).waitFor();
+await page.getByRole('button', { name: 'Dismiss message' }).click();
+await page.screenshot({ path: 'docs/screenshots/workspace.png', fullPage: true });
+await page.getByRole('button', { name: 'Run guided recovery drill' }).click();
+await page.getByText('Recovery independently checked', { exact: true }).waitFor({ timeout: 45000 });
+await expect(page.getByRole('button', { name: 'Run guided recovery drill' })).toBeEnabled();
+await page.getByRole('button', { name: 'Dismiss message' }).click();
+await page.screenshot({ path: 'docs/screenshots/recovery.png', fullPage: true });
+const evidence = await (
+  await page.request.get(new URL('/api/evidence', page.url()).toString())
+).json();
+writeFileSync('evidence/example-recovery.json', JSON.stringify(evidence, null, 2) + '\n');
+await page.getByRole('button', { name: 'Journey telemetry' }).click();
+await page.locator('.trace-link').first().click();
+await page.screenshot({ path: 'docs/screenshots/telemetry.png', fullPage: true });
+await page.getByRole('button', { name: 'Recovery workspace' }).click();
+await page.setViewportSize({ width: 390, height: 844 });
+await page.screenshot({ path: 'docs/screenshots/mobile.png', fullPage: true });
+const video = page.video();
+await context.close();
+if (video) copyFileSync(await video.path(), 'evidence/local-demo.webm');
+await browser.close();
+writeFileSync(
+  'evidence/browser-console.json',
+  JSON.stringify({ pageErrors: errors, scope: 'local production build walkthrough' }, null, 2) +
+    '\n',
+);
+if (errors.length) process.exitCode = 1;
+console.log(
+  JSON.stringify({ screenshots: 4, recovery: evidence.incident.status, pageErrors: errors.length }),
+);

@@ -20,6 +20,8 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: npm run format:check
+      - run: npm run lint
       - run: npx playwright install --with-deps chromium
       - run: npm test
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6

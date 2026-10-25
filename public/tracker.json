@@ -11,10 +11,7 @@
         "Observable acceptance scenarios recorded"
       ],
       "agent": "Product agent",
-      "evidence": [
-        "docs/product-spec.md",
-        "docs/agent-work-log.md (SRL-01 entry)"
-      ]
+      "evidence": ["docs/product-spec.md", "docs/agent-work-log.md (SRL-01 entry)"]
     },
     {
       "id": "SRL-02",
@@ -58,11 +55,7 @@
         "Sanitized evidence export"
       ],
       "agent": "Implementation agent",
-      "evidence": [
-        "Browser tests 1 and 4",
-        "docs/screenshots/*.png",
-        "evidence/local-demo.webm"
-      ]
+      "evidence": ["Browser tests 1 and 4", "docs/screenshots/*.png", "evidence/local-demo.webm"]
     },
     {
       "id": "SRL-05",
