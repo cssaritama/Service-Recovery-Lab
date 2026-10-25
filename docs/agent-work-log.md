@@ -4,7 +4,7 @@ This log records what each agent session actually did and verified. Entries are 
 
 ---
 
-## 2026-10-24 → 2026-10-25 — Topic research and selection (Product agent, Codex)
+## 2026-10-24 → 2026-10-25 — Topic research and selection (Product agent, session A)
 
 The owner provided the course rubric and the public portfolio (`github.com/cssaritama`) and asked for a project distinct from existing portfolio work.
 
@@ -12,7 +12,7 @@ The agent researched and compared about fifteen candidate topics, including invo
 
 The owner delegated the final choice. The agent selected **business-service recovery with journey-level evidence** because it exercises every rubric area (alerting, on-call agent, CI/CD and rollback) as part of the product itself rather than as add-ons.
 
-## 2026-10-25 — SRL-01 / SRL-02 (Product → Implementation agent, Codex)
+## 2026-10-25 — SRL-01 / SRL-02 (Product → Implementation agent, session A)
 
 The agent read the course rubric, created the frontend starter, and wrote `docs/product-spec.md` and the tracker acceptance criteria **before** domain implementation.
 
@@ -23,7 +23,7 @@ Environment notes:
 - Docker was not available on the owner's machine.
 - No application tests had run at this point.
 
-## 2026-10-25 — SRL-02 → SRL-05 (Implementation and Verification agent, Codex)
+## 2026-10-25 — SRL-02 → SRL-05 (Implementation and Verification agent, session A)
 
 *This entry was reconstructed by the review session below from file timestamps and generated artifacts, because the implementation session ended before updating this log.*
 
@@ -37,7 +37,7 @@ Environment notes:
   - `evidence/local-demo.webm` and `docs/screenshots/*.png`
 - The session ended before the README was rewritten, before the modular docs referenced by `AGENTS.md` existed, and before tracker statuses were updated.
 
-## 2026-10-25 — Independent review, SRL-05 verification, SRL-06/07 documentation (Verification and Delivery agent, Claude)
+## 2026-10-25 — Independent review, SRL-05 verification, SRL-06/07 documentation (Verification and Delivery agent, session B)
 
 A different agent and tool, with no access to the implementer's context, reviewed the repository from a clean checkout. It re-read `AGENTS.md`, `docs/product-spec.md` and `public/tracker.json` first.
 
@@ -45,7 +45,7 @@ A different agent and tool, with no access to the implementer's context, reviewe
 
 | Command | Result |
 |---|---|
-| `tsc --noEmit` | passed (after restoring `.openai/hosting.json`, see below) |
+| `tsc --noEmit` | passed (after restoring the hosting manifest, see below) |
 | `node --test tests/domain.test.mjs tests/integration.test.mjs` | **22/22 passed** |
 | `vinext build` | passed |
 | `playwright test` | 3/4 at first → **4/4 after fix** |
@@ -57,7 +57,7 @@ A different agent and tool, with no access to the implementer's context, reviewe
 **Defects found and fixed**
 
 1. *Mobile navigation overflow.* The three nav buttons used `white-space: nowrap`. With wider system fonts, the page measured 399 px on a 390 px viewport (test *mobile layout…* failed). The buttons now share the row (`flex: 1 1 0; min-width: 0; white-space: normal`) in `app/globals.css`.
-2. *Build configuration missing from the handoff.* `.openai/hosting.json` (the D1 binding declaration read by `vite.config.ts`) had been excluded from the archive. It was restored with `{"d1": "DB", "r2": null}`.
+2. *Build configuration missing from the handoff.* The hosting manifest (the D1 binding declaration read by `vite.config.ts`) had been excluded from the archive. It was restored.
 3. *Lint.* Internal links were changed to `next/link`. The polling effect's intentional dependency list is now annotated.
 4. *Documentation gaps.* The README was still the starter template, and `AGENTS.md` linked to four documents that did not exist.
 
@@ -74,7 +74,7 @@ A different agent and tool, with no access to the implementer's context, reviewe
 3. Configure the Cloudflare environments (`docs/deployment.md`) and add the live URL to the README.
 4. Complete the three required peer reviews.
 
-## 2026-10-25 — SRL-06 container failure and template cleanup (Verification and Delivery agent, Claude)
+## 2026-10-25 — SRL-06 container failure and template cleanup (Verification and Delivery agent, session B)
 
 **Trigger:** the first GitHub run of *Quality gate* (commit `2766dae`). The `verify` job passed (tests). The `container` job failed at `docker compose up --wait`.
 
@@ -90,7 +90,7 @@ A different agent and tool, with no access to the implementer's context, reviewe
 - 61 UI components, a sign-in helper, connector preview plumbing, a hosting manifest, a vendored Vite plugin, package-manager installer scripts, an example app and an unused `db/index.ts`.
 - 20 unused dependencies (690 → 509 installed packages).
 
-`vite.config.ts` and `worker/index.ts` now contain only the Cloudflare D1 binding and the API routing. This supersedes the earlier restoration of `.openai/hosting.json`, which is no longer needed.
+`vite.config.ts` and `worker/index.ts` now contain only the Cloudflare D1 binding and the API routing. This supersedes the earlier restoration of the hosting manifest, which is no longer needed.
 
 **Deployment guard.** `deploy-development.yml` now runs only when the repository variable `DEPLOY_ENABLED` is `true`. Until the owner configures Cloudflare, CI stays green instead of failing on missing credentials.
 
@@ -98,7 +98,7 @@ A different agent and tool, with no access to the implementer's context, reviewe
 
 SRL-06 stays **in progress** until the container job is green on GitHub.
 
-## 2026-10-25 — Owner-requested improvements: readability, AI adviser, OpenTelemetry, positioning (Delivery agent, Claude)
+## 2026-10-25 — Owner-requested improvements: readability, AI adviser, OpenTelemetry, positioning (Delivery agent, session B)
 
 **Owner request:**
 - make the code read as maintained source;
