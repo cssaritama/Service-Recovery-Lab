@@ -78,4 +78,6 @@ It checks health, books, injects a fault, asserts three 503s, waits for the agen
 | 2026-10-25 | Owner's Windows 11 laptop, Node 24 (implementation session) | Production-build walkthrough (`scripts/capture-demo.mjs`) completed with a verified recovery and zero page errors. It produced the screenshots, video, `evidence/example-recovery.json`, `evidence/browser-console.json` and `evidence/performance.json`. |
 | 2026-10-25 | Clean Linux checkout, Node 22, Chromium (independent verification session) | Typecheck passed · **22/22** unit + integration · build passed · **4/4** browser · smoke test passed against `npm run local` · ESLint clean |
 
+A second run on the same day covered the container. After the runtime-permission fix, the runtime image started as a non-root user with a persistent volume, became *healthy*, passed the smoke test and survived a restart.
+
 The independent run found one real defect: horizontal overflow of the mobile navigation on narrow screens with wider system fonts. It was fixed in `app/globals.css`, and the mobile test now passes on both platforms. See [agent-work-log.md](agent-work-log.md).

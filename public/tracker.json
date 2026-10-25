@@ -6,57 +6,111 @@
       "id": "SRL-01",
       "title": "Specify the product and evidence contract",
       "status": "done",
-      "acceptance": ["Problem, user and limits documented before domain code", "Observable acceptance scenarios recorded"],
+      "acceptance": [
+        "Problem, user and limits documented before domain code",
+        "Observable acceptance scenarios recorded"
+      ],
       "agent": "Product agent",
-      "evidence": ["docs/product-spec.md", "docs/agent-work-log.md (SRL-01 entry)"]
+      "evidence": [
+        "docs/product-spec.md",
+        "docs/agent-work-log.md (SRL-01 entry)"
+      ]
     },
     {
       "id": "SRL-02",
       "title": "Persistent and isolated reservation service",
       "status": "done",
-      "acceptance": ["Authenticated workspace isolation", "Atomic capacity and idempotent reservations", "Persistence after restart"],
+      "acceptance": [
+        "Authenticated workspace isolation",
+        "Atomic capacity and idempotent reservations",
+        "Persistence after restart"
+      ],
       "agent": "Implementation agent",
-      "evidence": ["Integration tests: session isolation, concurrent bookings, persistence after reopen", "lib/recovery/repository.ts (revision compare-and-swap)"]
+      "evidence": [
+        "Integration tests: session isolation, concurrent bookings, persistence after reopen",
+        "lib/recovery/repository.ts (revision compare-and-swap)"
+      ]
     },
     {
       "id": "SRL-03",
       "title": "Bounded alert-triggered recovery",
       "status": "done",
-      "acceptance": ["Booking failures trigger alert", "Agent repairs two allowlisted faults", "Unsupported faults escalate", "Live positive and negative verification"],
+      "acceptance": [
+        "Booking failures trigger alert",
+        "Agent repairs two allowlisted faults",
+        "Unsupported faults escalate",
+        "Live positive and negative verification"
+      ],
       "agent": "Implementation agent",
-      "evidence": ["Integration tests: alert invokes responder (both faults), unknown failure escalates, failed verification, stale and concurrent agent runs", "evidence/example-recovery.json"]
+      "evidence": [
+        "Integration tests: alert invokes responder (both faults), unknown failure escalates, failed verification, stale and concurrent agent runs",
+        "evidence/example-recovery.json"
+      ]
     },
     {
       "id": "SRL-04",
       "title": "Accessible product interface and evidence",
       "status": "done",
-      "acceptance": ["Complete journey through frontend", "Trace-correlated telemetry visible", "Responsive keyboard-operable UI", "Sanitized evidence export"],
+      "acceptance": [
+        "Complete journey through frontend",
+        "Trace-correlated telemetry visible",
+        "Responsive keyboard-operable UI",
+        "Sanitized evidence export"
+      ],
       "agent": "Implementation agent",
-      "evidence": ["Browser tests 1 and 4", "docs/screenshots/*.png", "evidence/local-demo.webm"]
+      "evidence": [
+        "Browser tests 1 and 4",
+        "docs/screenshots/*.png",
+        "evidence/local-demo.webm"
+      ]
     },
     {
       "id": "SRL-05",
       "title": "Unit, integration and frontend validation",
       "status": "done",
-      "acceptance": ["Automated tests pass in one command", "Concurrency and isolation covered", "Browser recovery journey verified"],
+      "acceptance": [
+        "Automated tests pass in one command",
+        "Concurrency and isolation covered",
+        "Browser recovery journey verified"
+      ],
       "agent": "Verification agent",
-      "evidence": ["npm test on 2026-10-25: 22/22 unit + integration, 4/4 browser (independent clean checkout)", "Mobile overflow defect found and fixed during review"]
+      "evidence": [
+        "npm test on 2026-10-25: 22/22 unit + integration, 4/4 browser (independent clean checkout)",
+        "Mobile overflow defect found and fixed during review"
+      ]
     },
     {
       "id": "SRL-06",
       "title": "Reproducible containers and delivery pipeline",
       "status": "in_progress",
-      "acceptance": ["One-command startup including database", "CI tests pull requests", "Automatic dev deployment and manual production promotion configured", "Rollback procedure supplied and checked where possible"],
+      "acceptance": [
+        "One-command startup including database",
+        "CI tests pull requests",
+        "Automatic dev deployment and manual production promotion configured",
+        "Rollback procedure supplied and checked where possible"
+      ],
       "agent": "Delivery agent",
-      "evidence": ["Dockerfile, compose.yaml, .github/workflows/*", "Remaining: first green CI run on GitHub, including the container job"]
+      "evidence": [
+        "Dockerfile, compose.yaml, .github/workflows/*",
+        "Container runtime fix verified locally: healthy, smoke test passed, data kept after restart",
+        "Remaining: first green CI run on GitHub, including the container job"
+      ]
     },
     {
       "id": "SRL-07",
       "title": "Publish and package verifiable submission",
       "status": "in_progress",
-      "acceptance": ["Deployment result documented", "English documentation and rubric matrix", "ZIP contains source, lockfile and evidence without secrets", "Remaining owner actions explicitly stated"],
+      "acceptance": [
+        "Deployment result documented",
+        "English documentation and rubric matrix",
+        "ZIP contains source, lockfile and evidence without secrets",
+        "Remaining owner actions explicitly stated"
+      ],
       "agent": "Delivery agent",
-      "evidence": ["README.md, docs/rubric-evidence.md, docs/deployment.md", "Remaining: public URL after Cloudflare deployment (owner account)"]
+      "evidence": [
+        "README.md, docs/rubric-evidence.md, docs/deployment.md",
+        "Remaining: public URL after Cloudflare deployment (owner account)"
+      ]
     }
   ]
 }

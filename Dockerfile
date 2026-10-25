@@ -10,7 +10,7 @@ FROM node:24-bookworm-slim AS runtime
 ENV NODE_ENV=production WRANGLER_SEND_METRICS=false SRL_HOST=0.0.0.0 PORT=3000 SRL_STATE_DIR=/app/data
 WORKDIR /app
 COPY --from=build --chown=node:node /app /app
-RUN mkdir -p /app/data && chown node:node /app/data
+RUN mkdir -p /app/data && chown node:node /app /app/data
 USER node
 EXPOSE 3000
 VOLUME ["/app/data"]

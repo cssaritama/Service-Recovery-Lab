@@ -11,7 +11,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository
+    # DEPLOY_ENABLED is a repository variable set once the Cloudflare environments exist (docs/deployment.md).
+    if: vars.DEPLOY_ENABLED == 'true' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: development
