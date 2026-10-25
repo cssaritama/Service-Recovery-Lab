@@ -34,11 +34,13 @@ export default function Guide() {
       <section className="panel">
         <h2>The responder’s authority</h2>
         <p>
-          The default responder is a deterministic, tool-using state machine. It can restore the
-          known-good catalog reference or resume a paused adapter. An optional local language-model
-          adviser can propose the same actions; deterministic guards still enforce the repair
-          contract. The public demo does not claim live language-model reasoning unless explicitly
-          configured.
+          The responder is a tool-using agent with two allowed repairs: restore the known-good
+          catalog reference or resume a paused adapter. In the cloud deployment it also asks a
+          language model (Cloudflare Workers AI) for a second opinion, sending only three booleans
+          that describe the service. The model can confirm the policy’s choice but never widen it: a
+          different answer, a malformed answer or no answer leads to escalation. The recovery
+          timeline records which reasoner was used and what the model proposed. Locally, the same
+          agent runs on the deterministic policy, or on Ollama if configured.
         </p>
         <p>
           Recovery requires a persisted positive probe reservation and an invalid request that

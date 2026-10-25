@@ -25,6 +25,8 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_D1_DATABASE_ID: ${{ vars.CLOUDFLARE_D1_DATABASE_ID }}
       CLOUDFLARE_WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME }}
+      ENABLE_WORKERS_AI: ${{ vars.ENABLE_WORKERS_AI }}
+      WORKERS_AI_MODEL: ${{ vars.WORKERS_AI_MODEL }}
       TARGET_STAGE: ${{ inputs.environment }}
       TARGET_VERSION: ${{ inputs.version_id }}
     steps:
