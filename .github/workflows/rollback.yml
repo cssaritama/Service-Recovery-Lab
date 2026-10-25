@@ -1,0 +1,45 @@
+name: Roll back a deployment
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [development, production]
+        required: true
+      version_id:
+        description: Previously verified Cloudflare Worker version ID
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.environment }}
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_D1_DATABASE_ID: ${{ vars.CLOUDFLARE_D1_DATABASE_ID }}
+      CLOUDFLARE_WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME }}
+      TARGET_STAGE: ${{ inputs.environment }}
+      TARGET_VERSION: ${{ inputs.version_id }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: node scripts/cloud-prepare.mjs "$TARGET_STAGE"
+      - name: Restore the selected Worker version
+        run: |
+          if [[ ! "$TARGET_VERSION" =~ ^[a-fA-F0-9-]{36}$ ]]; then exit 1; fi
+          npx wrangler rollback "$TARGET_VERSION" --config "dist/server/wrangler.$TARGET_STAGE.json" --yes
+      - run: npm run smoke
+        env:
+          BASE_URL: ${{ vars.DEPLOYMENT_URL }}

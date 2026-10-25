@@ -1,0 +1,9 @@
+import {writeFileSync,mkdirSync} from 'node:fs';
+const base=process.env.BASE_URL||'http://127.0.0.1:3000';
+const sessions=[];
+for(let i=0;i<12;i++){const r=await fetch(`${base}/api/session`,{method:'POST',headers:{'content-type':'application/json'},body:'{}'});if(!r.ok)throw new Error(`Session creation failed: ${r.status}`);sessions.push(r.headers.get('set-cookie').split(';')[0]);}
+const latencies=[];let successes=0;const started=performance.now();
+for(let wave=0;wave<4;wave++)await Promise.all(sessions.map(async(cookie,n)=>{const t=performance.now();const r=await fetch(`${base}/api/reservations`,{method:'POST',headers:{cookie,'content-type':'application/json','idempotency-key':`benchmark_${wave}_${n}_${crypto.randomUUID()}`},body:JSON.stringify({slotId:wave<3?'morning':'midday'})});await r.arrayBuffer();latencies.push(performance.now()-t);if(r.status!==201)throw new Error(`Booking failed: ${r.status}`);successes++;}));
+const totalMs=performance.now()-started;latencies.sort((a,b)=>a-b);const percentile=p=>Math.round(latencies[Math.min(latencies.length-1,Math.ceil(p*latencies.length)-1)]*100)/100;
+const result={recordedAt:new Date().toISOString(),scope:'Small synthetic HTTP benchmark of the local production Worker build; not a production capacity test',node:process.version,platform:process.platform,architecture:process.arch,requests:latencies.length,concurrency:12,successes,p50Ms:percentile(.5),p95Ms:percentile(.95),maxMs:percentile(1),wallTimeMs:Math.round(totalMs),observedRequestsPerSecond:Math.round(successes/(totalMs/1000)*100)/100,limitations:['Local machine and local D1 emulator','No internet latency, multi-region traffic or sustained load','Sessions were pre-created; each booking persists state and telemetry','Results do not establish an SLA or production throughput']};
+mkdirSync('evidence',{recursive:true});writeFileSync('evidence/performance.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));
