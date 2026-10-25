@@ -26,7 +26,7 @@ It is a working laboratory, not a compliance product.
 | CDAO, CIO, CTO | Where can AI act safely in operations? | A pattern for bounded autonomy: allowlist, second opinion, human escalation, audit trail |
 | Head of SRE or operations | Are we paging on what matters? | A journey-level indicator and alert that ignore user errors and infrastructure noise |
 | Risk, audit, compliance | Can this be reviewed independently? | Exportable JSON and OpenTelemetry evidence, redacted by design |
-| Engineering | Can we reproduce it? | One-command start, 33 automated tests plus 4 browser journeys, CI/CD with rollback |
+| Engineering | Can we reproduce it? | One-command start, 35 automated tests plus 4 browser journeys, CI/CD with rollback |
 
 ## Value hypotheses and how they would be measured
 

@@ -7,7 +7,11 @@
 
 **Prove the journey works — not just the server.**
 
-When something breaks, an executive is not asking *"is the server up?"*. They are asking *"can our customers still do business with us, who fixed it, and how do we know?"*
+**▶ Live demo: [service-recovery-lab.cssaritama.workers.dev](https://service-recovery-lab.cssaritama.workers.dev)**, free to use with synthetic data and no sign-up.
+
+Every organisation eventually lives the same moment: **the dashboards are green, and the customers cannot pay.**
+
+In that moment no one is asking *"is the server up?"*. Three questions decide the outcome: *can our customers still do business with us, who fixed it, and how do we know?*
 
 Service Recovery Lab answers those three questions in one working system:
 
@@ -49,7 +53,7 @@ These principles come from data and AI leadership practice, and the code enforce
 | **Cloud and FinOps** | Runs entirely on free tiers (Cloudflare Workers, D1, Workers AI), with built-in caps that keep a public demo cost-bounded. |
 | **AI governance** | Bounded autonomy, a model as second opinion rather than decision-maker, human escalation for the unknown, and an audit trail of what the model proposed. |
 | **Operations** | Journey-level alerting, an on-call agent, verified recovery, runbooks, and OpenTelemetry evidence that is portable to any observability platform. |
-| **Delivery** | 33 automated tests plus 4 browser journeys, enforced code style, CI on every change, automatic deployment to development, approved production promotion and one-click rollback. |
+| **Delivery** | 35 automated tests plus 4 browser journeys, enforced code style, CI on every change, automatic deployment to development, approved production promotion and one-click rollback. |
 | **Leadership** | A human-led team of AI agents with defined roles, a public tracker, and independent verification before anything counts as done. |
 
 ## How it was built: one lead, a team of AI agents
@@ -78,6 +82,8 @@ Regulators are moving from *"have a recovery plan"* to *"prove that it works"*. 
 Details: [strategy, value and roadmap](docs/strategy.md).
 
 ## Try it in five minutes
+
+Open the **[live demo](https://service-recovery-lab.cssaritama.workers.dev)**, or run it yourself:
 
 ```bash
 docker compose up --build          # app + database, one command
@@ -125,7 +131,7 @@ flowchart LR
     REPO["Repository<br/>optimistic concurrency"]
   end
   DB[("D1 / SQLite")]
-  AI["Workers AI · Llama 3.1<br/>(or local Ollama)"]
+  AI["Workers AI · Llama 3.3 70B<br/>(or local Ollama)"]
   COL["OpenTelemetry collector<br/>Grafana · any OTLP backend"]
 
   UI -- "fetch + HttpOnly cookie" --> API
@@ -142,7 +148,7 @@ flowchart LR
 | Frontend | React 19, Next.js App Router on vinext (Vite), Tailwind CSS 4 |
 | Backend | TypeScript on Cloudflare Workers (`workerd` locally and in Docker) |
 | Data | Cloudflare D1 (SQLite) with Drizzle migrations |
-| AI | Cloudflare Workers AI (Llama 3.1 8B Instruct) as an advisory reasoner; Ollama locally |
+| AI | Cloudflare Workers AI (Llama 3.3 70B in JSON mode, configurable) as an advisory reasoner; Ollama locally |
 | Observability | OpenTelemetry OTLP/JSON traces, logs and metrics; Grafana LGTM stack via Docker; Workers Logs |
 | Quality | Node.js test runner, Playwright, ESLint, Prettier |
 | Delivery | Docker Compose, GitHub Actions (CI → automatic dev → manual production → rollback) |
@@ -183,9 +189,9 @@ The guardrails cannot be bypassed:
 
 ## Engineering quality
 
-- **33 automated tests plus 4 browser journeys, one command** (`npm test`):
+- **35 automated tests plus 4 browser journeys, one command** (`npm test`):
   - 9 domain unit tests
-  - 7 model-adviser tests (parsing, timeouts, disagreement → escalation)
+  - 9 model-adviser tests (JSON mode, parsing, response formats, timeouts, disagreement → escalation)
   - 4 OpenTelemetry tests (encoding, a real HTTP collector, redaction)
   - 13 integration tests on a real SQLite database (isolation, concurrency without overselling, end-to-end recovery, stale and duplicate agent runs, persistence)
   - 4 Playwright browser journeys (desktop and mobile)
@@ -221,9 +227,11 @@ This repository is also my capstone for the [AI Dev Tools Zoomcamp](https://gith
 
 ## About the author
 
-**Carlos Saritama** · [github.com/cssaritama](https://github.com/cssaritama)
+**Carlos Saritama**
 
-I work where data, AI and business strategy meet. My focus is on making them measurable, governed and accountable to the outcomes an organisation actually cares about. Service Recovery Lab applies that conviction to a question every leadership team eventually faces: *when something breaks, can we prove that our customers are served again, and that our automation acted within the limits we set?*
+> *The next decade will not belong to the companies with the most AI, but to the ones that can trust it.*
+
+I design and build Data & AI systems meant to be trusted: measurable by executives, verifiable by auditors and invisible to customers. Service Recovery Lab turns that conviction into working code: **autonomy is earned with evidence.**
 
 ## License
 

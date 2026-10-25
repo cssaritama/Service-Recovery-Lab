@@ -74,14 +74,14 @@
       ],
       "agent": "Verification agent",
       "evidence": [
-        "npm test: 33/33 unit + adviser + OpenTelemetry + integration, 4/4 browser",
+        "npm test: 35/35 unit + adviser + OpenTelemetry + integration, 4/4 browser",
         "Mobile overflow defect found and fixed during review"
       ]
     },
     {
       "id": "SRL-06",
       "title": "Reproducible containers and delivery pipeline",
-      "status": "in_progress",
+      "status": "done",
       "acceptance": [
         "One-command startup including database",
         "CI tests pull requests",
@@ -91,14 +91,14 @@
       "agent": "Delivery agent",
       "evidence": [
         "Dockerfile, compose.yaml, .github/workflows/*",
-        "Container runtime fix verified locally: healthy, smoke test passed, data kept after restart",
-        "Remaining: first green CI run on GitHub, including the container job"
+        "Quality gate green on GitHub, including the container job",
+        "Development and production deployed on Cloudflare Workers + D1; production smoke test passed"
       ]
     },
     {
       "id": "SRL-07",
       "title": "Publish and package verifiable submission",
-      "status": "in_progress",
+      "status": "done",
       "acceptance": [
         "Deployment result documented",
         "English documentation and reviewer guide",
@@ -107,8 +107,9 @@
       ],
       "agent": "Delivery agent",
       "evidence": [
+        "Public URL: https://service-recovery-lab.cssaritama.workers.dev",
         "README.md, docs/reviewer-guide.md, docs/deployment.md",
-        "Remaining: public URL after Cloudflare deployment (owner account)"
+        "Production smoke test 2026-10-25: booking, alert, AI-advised repair, verified recovery (201/422/persisted)"
       ]
     }
   ]

@@ -119,3 +119,30 @@ SRL-06 stays **in progress** until the container job is green on GitHub.
 4. **README** rewritten around the executive questions, the operating principles and the human-led agent model. Reviewer material moved to a dedicated section.
 
 **Result:** `npm test` exit 0 (33/33 and 4/4), Prettier and ESLint clean.
+
+## 2026-10-25 — First cloud deployment (Delivery agent, session B)
+
+**What happened:** the owner deployed `development` and `production` to Cloudflare Workers from a local script. D1 migrations applied, the Worker started, and both URLs served the app. The production smoke test then failed: the incident ended **escalated** instead of recovered.
+
+**Root cause:** the timeline read `Workers AI @cf/meta/llama-3.1-8b-instruct proposed no valid answer`. That model was retired by Cloudflare on 2026-05-30 ([deprecation notice](https://developers.cloudflare.com/changelog/post/2026-05-08-planned-model-deprecations/)). The guardrail behaved as designed: with no valid second opinion, the agent refused to repair and escalated.
+
+**Fix:**
+- The default model is now `@cf/zai-org/glm-4.7-flash` (overridable with `WORKERS_AI_MODEL`).
+- Answers are read from both the `{ response }` and the OpenAI-compatible `choices` shapes, ignoring reasoning traces. The token budget is raised from 40 to 256.
+- Adviser failures now record a sanitised reason in the timeline, for example `no valid answer (adviser_timeout)`.
+
+**Second redeploy:** the timeline then showed `glm-4.7-flash proposed no valid answer (adviser_output_invalid)`. The model answered, but not in a parseable form; it is a reasoning-style model.
+
+**Change:**
+- The default model is now `@cf/meta/llama-3.3-70b-instruct-fp8-fast`, which is active and supports [JSON mode](https://developers.cloudflare.com/workers-ai/json-mode/). It is called with a JSON Schema whose enum is the allowlist.
+- The adviser retries without JSON mode if the model rejects it.
+- The parser ignores `<think>` blocks and takes the last `"action"` value.
+
+**Verification:** 35/35 tests passed and `tsc` was clean.
+
+**Third redeploy (production version `69e649de`):** the production smoke test **passed** against https://service-recovery-lab.cssaritama.workers.dev:
+- health check, booking, user-impact alert, Workers AI agreement, repair;
+- verified recovery (positive 201, negative 422, persisted);
+- the original reservation was preserved.
+
+SRL-06 and SRL-07 → **done**.

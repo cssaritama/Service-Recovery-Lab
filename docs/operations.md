@@ -82,7 +82,7 @@ The agent can ask a language model for a **second opinion** before repairing. Wh
 
 | Where | Adviser | How it is enabled |
 |---|---|---|
-| Cloud (`development`, `production`) | Cloudflare **Workers AI**, `@cf/meta/llama-3.1-8b-instruct` by default (free daily allocation) | Automatic: `scripts/cloud-prepare.mjs` adds the `AI` binding. Set the repository variable `ENABLE_WORKERS_AI=false` to turn it off, or `WORKERS_AI_MODEL` to choose another model. |
+| Cloud (`development`, `production`) | Cloudflare **Workers AI**, `@cf/meta/llama-3.3-70b-instruct-fp8-fast` by default, in JSON mode (free daily allocation) | Automatic: `scripts/cloud-prepare.mjs` adds the `AI` binding. Set the repository variable `ENABLE_WORKERS_AI=false` to turn it off, or `WORKERS_AI_MODEL` to choose another model. |
 | Local or Docker | **Ollama** | Set `OLLAMA_URL` (and optionally `OLLAMA_MODEL`, default `qwen2.5:0.5b`) |
 | Neither configured | None: the deterministic policy decides alone | — |
 
@@ -90,7 +90,7 @@ How the second opinion works:
 - The model receives **only three booleans**: catalog available, adapter ready, unknown dependency. It never sees customer data.
 - Its free-form answer is reduced to exactly one allowlisted action (`lib/recovery/advisers.ts`). Anything else counts as *no valid answer*.
 - If the answer matches the policy diagnosis, the repair proceeds. If it differs, is malformed or exceeds the timeout (15 s for Workers AI, 20 s for Ollama), the agent **escalates** to the operator.
-- The *Diagnose* step in the timeline records the model and its proposal. Example: `Reasoner: model-advised (Workers AI @cf/meta/llama-3.1-8b-instruct proposed restore_catalog; policy selected restore_catalog)`.
+- The *Diagnose* step in the timeline records the model and its proposal. Example: `Reasoner: model-advised (Workers AI @cf/meta/llama-3.3-70b-instruct-fp8-fast proposed restore_catalog; policy selected restore_catalog)`.
 
 The model can never widen the agent's authority.
 

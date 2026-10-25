@@ -45,8 +45,12 @@ export async function respond(repo: Repository, id: string, probe: Probe, adviso
         adapterReady: observed.config.adapter === 'ready',
         unknownDependency: observed.config.unknownFault,
       });
-    } catch {
-      /* An unavailable or malformed adviser is treated as disagreement. */
+    } catch (error) {
+      // An unavailable or malformed adviser is treated as disagreement. Only a short,
+      // sanitised reason is recorded; model output and provider messages never are.
+      const code = error instanceof Error ? error.message : '';
+      const reason = /^adviser_[a-z_]+$/.test(code) ? code : 'model_unavailable';
+      proposed = `no valid answer (${reason})`;
     }
     if (proposed !== policy) decision = 'escalate';
     reasoner = `model-advised (${advisor.label ?? 'language model'} proposed ${proposed}; policy selected ${policy})`;

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { database } from './sqlite-adapter.mjs';
 import { handleApi } from '../lib/recovery/api.ts';
 import {
+  modelText,
   parseAction,
   selectAdvisor,
   workersAiAdvisor,
@@ -53,7 +54,10 @@ test('a slow or malformed model answer is rejected', async () => {
 
 test('adviser selection: Workers AI, then Ollama, then deterministic policy only', () => {
   const ai = { run: async () => ({}) };
-  assert.match(selectAdvisor({ AI: ai, OLLAMA_URL: 'http://x' }).label, /^Workers AI @cf\/meta\//);
+  assert.equal(
+    selectAdvisor({ AI: ai, OLLAMA_URL: 'http://x' }).label,
+    'Workers AI @cf/meta/llama-3.3-70b-instruct-fp8-fast',
+  );
   assert.equal(selectAdvisor({ AI: ai, WORKERS_AI_MODEL: '@cf/x/y' }).label, 'Workers AI @cf/x/y');
   assert.equal(selectAdvisor({ OLLAMA_URL: 'http://x' }).label, 'Ollama qwen2.5:0.5b');
   assert.equal(selectAdvisor({}), undefined);
@@ -101,7 +105,7 @@ test('alert → Workers AI agrees with the policy → verified recovery, reasone
   const diagnosis = state.incident.steps.find(s => s.phase === 'Diagnose');
   assert.match(
     diagnosis.detail,
-    /Workers AI @cf\/meta\/.* proposed restore_catalog; policy selected restore_catalog/,
+    /Workers AI @cf\/meta\/llama-3\.3-70b-instruct-fp8-fast proposed restore_catalog; policy selected restore_catalog/,
   );
   assert.equal(state.reservations.filter(r => !r.probe).length, 1);
 });
@@ -122,6 +126,74 @@ test('alert → Workers AI unavailable → escalation instead of guessing', asyn
   assert.equal(state.incident.status, 'escalated');
   assert.match(
     state.incident.steps.find(s => s.phase === 'Diagnose').detail,
-    /proposed no valid answer/,
+    /proposed no valid answer \(model_unavailable\)/,
   );
+});
+
+test('model answers are read from both Workers AI response shapes', async () => {
+  assert.equal(modelText({ response: 'a' }), 'a');
+  assert.equal(
+    modelText({ choices: [{ message: { content: 'b', reasoning_content: 'c' } }] }),
+    'b',
+  );
+  const advise = workersAiAdvisor(
+    {
+      run: async () => ({
+        choices: [
+          {
+            message: {
+              content: '{"action":"resume_adapter"}',
+              reasoning_content: 'restore_catalog or escalate?',
+            },
+          },
+        ],
+      }),
+    },
+    'm',
+  );
+  assert.equal(await advise(observation), 'resume_adapter');
+  const timed = workersAiAdvisor({ run: () => new Promise(() => {}) }, 'm', 20);
+  await assert.rejects(timed(observation), /adviser_timeout/);
+});
+
+test('JSON mode is requested, reasoning is ignored, and unsupported JSON mode falls back', async () => {
+  assert.equal(
+    parseAction('<think>restore_catalog or escalate?</think>{"action":"escalate"}'),
+    'escalate',
+  );
+  assert.equal(
+    parseAction('Considering "action": "resume_adapter"... final: {"action":"restore_catalog"}'),
+    'restore_catalog',
+  );
+  assert.equal(parseAction({ action: 'resume_adapter' }), 'resume_adapter');
+  const inputs = [];
+  const strict = workersAiAdvisor(
+    {
+      run: async (_, input) => {
+        inputs.push(input);
+        return { response: { action: 'restore_catalog' } };
+      },
+    },
+    'm',
+  );
+  assert.equal(await strict(observation), 'restore_catalog');
+  assert.equal(inputs[0].response_format.type, 'json_schema');
+  assert.deepEqual(inputs[0].response_format.json_schema.properties.action.enum, [
+    'restore_catalog',
+    'resume_adapter',
+    'escalate',
+  ]);
+  let calls = 0;
+  const fallback = workersAiAdvisor(
+    {
+      run: async (_, input) => {
+        calls++;
+        if (input.response_format) throw new Error('JSON Mode not supported');
+        return { response: '{"action":"resume_adapter"}' };
+      },
+    },
+    'm',
+  );
+  assert.equal(await fallback(observation), 'resume_adapter');
+  assert.equal(calls, 2);
 });

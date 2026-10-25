@@ -11,7 +11,7 @@ npm test
 `npm test` ([`scripts/test.mjs`](../scripts/test.mjs)) runs four stages in order and exits non-zero on the first failure:
 
 1. **Typecheck:** `tsc --noEmit`
-2. **Unit, adviser, OpenTelemetry and integration:** Node.js built-in test runner (33 tests). Results go to stdout and to `test-results/unit-integration.xml` (JUnit).
+2. **Unit, adviser, OpenTelemetry and integration:** Node.js built-in test runner (35 tests). Results go to stdout and to `test-results/unit-integration.xml` (JUnit).
 3. **Production build:** `vinext build`
 4. **Browser tests:** Playwright starts the production build on port 4317 against an isolated test database. Results go to `test-results/browser.xml` and `playwright-report/`.
 
@@ -34,7 +34,7 @@ Pure domain rules, no I/O.
 | manual restore is never counted as agent recovery | Status `cancelled`, recoveries = 0 |
 | probe inventory is separate and bounded | Probes never reduce customer capacity; budget of 80 |
 
-### Model-adviser tests: `tests/advisers.test.mjs` (7)
+### Model-adviser tests: `tests/advisers.test.mjs` (9)
 
 | Test | Guarantees |
 |---|---|
@@ -42,6 +42,8 @@ Pure domain rules, no I/O.
 | Workers AI adviser sends only the three booleans and parses the answer | Prompt contents, model ID, temperature 0 |
 | a slow or malformed model answer is rejected | Timeout and invalid output |
 | adviser selection | Workers AI → Ollama → deterministic policy only |
+| JSON mode requested; reasoning ignored; fallback without JSON mode | Schema enum = allowlist; `<think>` blocks and earlier drafts ignored |
+| model answers are read from both Workers AI response shapes | `{ response }` and OpenAI-compatible `choices`; reasoning traces ignored |
 | alert → Workers AI agrees → verified recovery, reasoner recorded | End-to-end through the API with a stub AI binding |
 | alert → Workers AI proposes a different repair → escalation | No configuration change, recoveries = 0 |
 | alert → Workers AI unavailable → escalation | Quota or outage never leads to guessing |
@@ -102,5 +104,7 @@ It checks health, books, injects a fault, asserts three 503s, waits for the agen
 After the agent and telemetry additions: **33/33** unit, adviser, OpenTelemetry and integration tests and **4/4** browser tests passed; Prettier and ESLint were clean. Live OTLP export was checked against the real runtime: the six requests of the smoke test produced six traces, six logs and six metrics at a local collector.
 
 A second run on the same day covered the container. After the runtime-permission fix, the runtime image started as a non-root user with a persistent volume, became *healthy*, passed the smoke test and survived a restart.
+
+**Production (Cloudflare Workers, 2026-10-25):** `scripts/smoke.mjs` against https://service-recovery-lab.cssaritama.workers.dev passed, with health, booking, alert, Workers AI-advised repair and verified recovery (201/422/persisted).
 
 The independent run found one real defect: horizontal overflow of the mobile navigation on narrow screens with wider system fonts. It was fixed in `app/globals.css`, and the mobile test now passes on both platforms. See [agent-work-log.md](agent-work-log.md).
