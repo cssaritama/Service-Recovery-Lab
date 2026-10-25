@@ -41,7 +41,8 @@
       "agent": "Implementation agent",
       "evidence": [
         "Integration tests: alert invokes responder (both faults), unknown failure escalates, failed verification, stale and concurrent agent runs",
-        "evidence/example-recovery.json"
+        "evidence/example-recovery.json",
+        "tests/advisers.test.mjs: Workers AI second opinion; disagreement escalates"
       ]
     },
     {
@@ -55,7 +56,12 @@
         "Sanitized evidence export"
       ],
       "agent": "Implementation agent",
-      "evidence": ["Browser tests 1 and 4", "docs/screenshots/*.png", "evidence/local-demo.webm"]
+      "evidence": [
+        "Browser tests 1 and 4",
+        "docs/screenshots/*.png",
+        "evidence/local-demo.webm",
+        "tests/otel.test.mjs: OpenTelemetry export, Grafana via compose.observability.yaml"
+      ]
     },
     {
       "id": "SRL-05",
@@ -68,7 +74,7 @@
       ],
       "agent": "Verification agent",
       "evidence": [
-        "npm test on 2026-10-25: 22/22 unit + integration, 4/4 browser (independent clean checkout)",
+        "npm test: 33/33 unit + adviser + OpenTelemetry + integration, 4/4 browser",
         "Mobile overflow defect found and fixed during review"
       ]
     },

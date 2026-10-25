@@ -97,3 +97,26 @@ A different agent and tool, with no access to the implementer's context, reviewe
 **Checks after the changes:** `npm test` exit 0 (22/22 unit + integration, 4/4 browser), `tsc` clean, ESLint clean.
 
 SRL-06 stays **in progress** until the container job is green on GitHub.
+
+## 2026-10-25 — Owner-requested improvements: readability, AI adviser, OpenTelemetry, positioning (Delivery agent, Claude)
+
+**Owner request:**
+- make the code read as maintained source;
+- give the on-call agent a real language model in the public demo;
+- strengthen observability with an industry standard;
+- reposition the README for executive readers.
+
+**Changes and verification:**
+
+1. **Prettier** is the single code style, with `format:check` and `lint` enforced in CI. No behaviour change; the full suite passed.
+2. **Workers AI adviser** (`lib/recovery/advisers.ts`). The cloud deployment binds `AI` and asks `@cf/meta/llama-3.1-8b-instruct` for a second opinion on three booleans. Outputs are parsed into one allowlisted action, and any disagreement, malformed output or timeout escalates. The timeline records the model and its proposal.
+   - 7 tests in `tests/advisers.test.mjs`, end-to-end paths included.
+   - `wrangler deploy --dry-run` confirmed the `env.AI` binding.
+   - Not verified here: a live Workers AI call. It needs the owner's Cloudflare account.
+3. **OpenTelemetry** (`lib/recovery/otel.ts`): OTLP/JSON spans, logs and metrics with exemplars, `/api/telemetry/otlp`, optional live export, and `compose.observability.yaml` with Grafana LGTM.
+   - 4 tests in `tests/otel.test.mjs`, including a real HTTP collector.
+   - Checked against workerd: 6 requests produced 6 traces, 6 logs and 6 metrics.
+   - Not verified here: pulling `grafana/otel-lgtm`, because Docker Hub is blocked in this environment.
+4. **README** rewritten around the executive questions, the operating principles and the human-led agent model. The course context moved to a reviewer section.
+
+**Result:** `npm test` exit 0 (33/33 and 4/4), Prettier and ESLint clean.

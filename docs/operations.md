@@ -22,6 +22,28 @@ How the signals flow:
 - **Viewable** in the UI under *Journey telemetry*. The trace table links to a detail view showing the span, log and metric for one trace ID. The same data is included in the evidence export.
 - **Also emitted** as one-line JSON to stdout (`console.log`) with `trace_id`. In the cloud these appear in **Cloudflare Workers Logs** (observability is enabled in the generated Worker config). Filter by `trace_id` in the dashboard. Errors emit `api.error` with `trace_id` and a code, never a stack trace or payload.
 - **Returned to the client** in the `x-trace-id` header and the JSON body, so a user-reported problem can be traced.
+- **OpenTelemetry.** `lib/recovery/otel.ts` encodes the same signals as OTLP/JSON:
+  - a `SERVER` span with status;
+  - a log record with severity, `traceId` and `spanId`;
+  - a monotonic `reservation_journey_total` sum, whose data point carries a trace exemplar.
+
+  `GET /api/telemetry/otlp` downloads them (the *OpenTelemetry (OTLP)* link in the telemetry view). With `OTEL_EXPORTER_OTLP_ENDPOINT` set, each attempt is also pushed live to `/v1/traces`, `/v1/logs` and `/v1/metrics`, with optional `OTEL_EXPORTER_OTLP_HEADERS`. Export is best-effort and never affects the request.
+
+### Viewing telemetry in Grafana (local)
+
+```bash
+docker compose -f compose.yaml -f compose.observability.yaml up --build
+```
+
+This adds `grafana/otel-lgtm` (OpenTelemetry collector, Tempo, Loki, Prometheus and Grafana).
+
+1. Book and run a drill at <http://localhost:3000>.
+2. Open Grafana at <http://localhost:3001> → *Explore*.
+3. Find the data:
+   - **Tempo:** search `service.name = service-recovery-lab` for spans.
+   - **Loki:** `{service_name="service-recovery-lab"}` for logs.
+   - **Prometheus:** `reservation_journey_total` for the metric.
+4. A span's trace ID matches the one shown in the app.
 
 **Redaction rules:** telemetry never contains request bodies, cookies, session tokens, token hashes or raw exceptions. This is asserted by an integration test.
 
@@ -54,14 +76,23 @@ The responder runs automatically after the alert (`ctx.waitUntil`). Its timeline
 3. Fix the cause. In the lab, click **Restore manually**, which restores the known-good configuration.
 4. The incident closes as **cancelled**, which keeps operator actions distinct from autonomous recoveries in the evidence and the metrics.
 
-### Optional model adviser
-Set `OLLAMA_URL` (and optionally `OLLAMA_MODEL`, default `qwen2.5:0.5b`) for `npm run local` or in `.env` for Docker.
+### Model adviser (Workers AI or Ollama)
 
-The agent then sends only three booleans to the model (catalog available, adapter ready, unknown dependency) and asks for one of the allowlisted actions as JSON. The model's answer is a second opinion:
-- If it matches the deterministic diagnosis, the repair proceeds, and the timeline shows `Reasoner: model-advised`.
-- If it differs, times out (20 s) or is malformed, the agent **escalates**.
+The agent can ask a language model for a **second opinion** before repairing. Which adviser runs:
 
-The model can never widen the agent's authority, and no customer data is sent to it.
+| Where | Adviser | How it is enabled |
+|---|---|---|
+| Cloud (`development`, `production`) | Cloudflare **Workers AI**, `@cf/meta/llama-3.1-8b-instruct` by default (free daily allocation) | Automatic: `scripts/cloud-prepare.mjs` adds the `AI` binding. Set the repository variable `ENABLE_WORKERS_AI=false` to turn it off, or `WORKERS_AI_MODEL` to choose another model. |
+| Local or Docker | **Ollama** | Set `OLLAMA_URL` (and optionally `OLLAMA_MODEL`, default `qwen2.5:0.5b`) |
+| Neither configured | None: the deterministic policy decides alone | — |
+
+How the second opinion works:
+- The model receives **only three booleans**: catalog available, adapter ready, unknown dependency. It never sees customer data.
+- Its free-form answer is reduced to exactly one allowlisted action (`lib/recovery/advisers.ts`). Anything else counts as *no valid answer*.
+- If the answer matches the policy diagnosis, the repair proceeds. If it differs, is malformed or exceeds the timeout (15 s for Workers AI, 20 s for Ollama), the agent **escalates** to the operator.
+- The *Diagnose* step in the timeline records the model and its proposal. Example: `Reasoner: model-advised (Workers AI @cf/meta/llama-3.1-8b-instruct proposed restore_catalog; policy selected restore_catalog)`.
+
+The model can never widen the agent's authority.
 
 ## Rollback
 

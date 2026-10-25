@@ -40,6 +40,7 @@ A framework-free `Request → Response` handler, so it can be tested without a s
 | `POST /api/session` | Creates an isolated workspace and sets an `HttpOnly; SameSite=Strict` cookie |
 | `GET /api/workspace` | Workspace snapshot: slots with remaining capacity, reservations, incident, traces, metrics |
 | `GET /api/evidence` | The same snapshot as a downloadable, sanitised evidence package |
+| `GET /api/telemetry/otlp` | The workspace's retained telemetry as OpenTelemetry OTLP/JSON (traces, logs, metrics) |
 | `POST /api/reservations` | Visitor booking. Requires an `Idempotency-Key` header. |
 | `POST /api/probe` | Synthetic probe booking against the reserved probe slot |
 | `POST /api/drills` | Starts a controlled fault: `catalog_unavailable`, `adapter_paused` or `unknown_dependency` |
@@ -61,7 +62,13 @@ Pure functions over a `State` document:
 No I/O happens here, which makes the business rules fully unit-testable.
 
 ### On-call agent — `lib/recovery/agent.ts`
-A tool-using state machine with four phases: **observe → diagnose → repair → verify**. See [operations.md](operations.md) for its authority and runbook.
+A tool-using agent with four phases: **observe → diagnose → repair → verify**. See [operations.md](operations.md) for its authority and runbook.
+
+### Model adviser — `lib/recovery/advisers.ts`
+Optional second opinion from a language model: Cloudflare Workers AI in the cloud, Ollama locally. It receives three booleans, and its answer is parsed into one allowlisted action. Disagreement, malformed output or timeout → escalation.
+
+### OpenTelemetry encoder — `lib/recovery/otel.ts`
+Encodes journey signals as OTLP/JSON traces, logs and metrics. It serves `/api/telemetry/otlp` and pushes live to a collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
 
 ### Repository — `lib/recovery/repository.ts`
 - Each workspace is one row holding a JSON document plus a `revision` counter.
@@ -96,7 +103,8 @@ Migrations live in `drizzle/` and are applied by Wrangler in every environment.
 | Decision | Alternatives considered | Rationale |
 |---|---|---|
 | Alert on consecutive **5xx booking failures**, excluding 4xx | CPU/latency thresholds; any error | Measures customer impact. Invalid input is the user's error, not an outage. |
-| **Deterministic policy** as the default reasoner, LLM optional and advisory | LLM decides and acts | The repair must be reproducible and safe in a public demo at zero cost. A model can add value as a second opinion but never gains authority. |
+| **Deterministic policy decides; an LLM (Workers AI) gives a second opinion** | LLM decides and acts | The repair must be reproducible and safe in a public demo at zero cost. The model adds an independent check, and disagreement routes to a human instead of to an action. |
+| **OpenTelemetry OTLP/JSON** encoded by hand | OpenTelemetry JS SDK | The SDK's Node exporters do not run on Workers. OTLP/JSON over `fetch` is standard, dependency-free and accepted by any OTLP backend. |
 | Verification needs **positive and negative** probes plus persistence | Positive probe only; config check only | A fix that disables validation would pass a positive-only check. Config checks do not prove the journey works. |
 | **Per-visitor workspace** isolation | Shared global demo state | Public visitors can break things safely without affecting anyone else. |
 | Document-per-workspace with **revision CAS** | Normalised tables with row locks | D1/SQLite has no long-lived transactions across requests. CAS gives atomic multi-field updates and simple stale-write protection. |
