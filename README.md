@@ -1,5 +1,8 @@
 # Service Recovery Lab
 
+[![Quality gate](https://github.com/cssaritama/Service-Recovery-Lab/actions/workflows/ci.yml/badge.svg)](https://github.com/cssaritama/Service-Recovery-Lab/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **Prove the journey works — not just the server.**
 
 Service Recovery Lab is a full-stack laboratory for one question every operations leader eventually has to answer under pressure: *after something breaks, can a customer actually complete the thing they came to do?*
@@ -7,6 +10,12 @@ Service Recovery Lab is a full-stack laboratory for one question every operation
 It runs a small but real reservation service, lets you inject a controlled fault, alerts on **user impact** (failed bookings, not CPU graphs), wakes a **bounded on-call agent** that diagnoses and repairs the fault, and then **verifies recovery against the live business journey** before it is allowed to say "recovered". Every step leaves a trace-correlated, exportable evidence trail.
 
 ![Recovery workspace after a verified recovery](docs/screenshots/recovery.png)
+
+**In one minute, for decision-makers**
+
+- **Risk:** "the server is up" is not the same as "customers can buy". This lab measures and alerts on the second.
+- **AI with bounded autonomy:** an agent fixes the incident on its own, but only within an explicit allowlist. It must prove the fix against the real customer journey and must hand over to a human when it is unsure.
+- **Audit-ready evidence:** every incident produces a causal, trace-linked record (fault → alert → diagnosis → repair → verification) that can be exported and reviewed.
 
 > Final project for the [AI Dev Tools Zoomcamp](https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/tree/main/project) (DataTalks.Club). Documentation is in English; all data is synthetic.
 
@@ -182,7 +191,7 @@ sequenceDiagram
 | Build | `vinext build` | Production Worker bundle |
 | **Frontend / E2E** (4) | `tests/browser/journeys.spec.ts` | Booking + reload + guided recovery + telemetry drill-down + evidence export; escalation + manual restore; two isolated browser sessions; mobile layout and keyboard navigation |
 
-Latest local run: **22/22 unit + integration passed, 4/4 browser tests passed**, plus the deployment smoke test. Details: **[docs/testing.md](docs/testing.md)**.
+Latest independent run: **22/22 unit + integration passed, 4/4 browser tests passed**, plus the smoke test against both the local server and the container. Details: **[docs/testing.md](docs/testing.md)**.
 
 ## 8. Containers, deployment and CI/CD
 

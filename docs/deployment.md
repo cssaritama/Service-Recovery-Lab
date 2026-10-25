@@ -40,6 +40,8 @@ For **each** environment, add:
 
 Your `<subdomain>` is shown under *Workers & Pages → Overview* (it is your `*.workers.dev` subdomain).
 
+Finally, under *Settings → Secrets and variables → Actions → Variables* (repository level), add `DEPLOY_ENABLED` = `true`. Until this variable exists, the development deployment is skipped instead of failing, so CI stays green before the cloud is configured.
+
 On the **production** environment, enable **Required reviewers** and add yourself. This makes the production promotion an explicit human approval.
 
 The worker name in `CLOUDFLARE_WORKER_NAME` must be lowercase letters, digits and hyphens, 3–63 characters (it is validated by `scripts/cloud-prepare.mjs`).
@@ -70,4 +72,4 @@ Links worth keeping for reviewers:
 | `Set CLOUDFLARE_D1_DATABASE_ID for this environment.` | The variable is missing or is not a UUID in that GitHub environment |
 | `Authentication error [code: 10000]` | The token lacks *Workers Scripts: Edit* or *D1: Edit* |
 | Smoke test `Process health failed` | `DEPLOYMENT_URL` is wrong, or it is the first deploy and the `workers.dev` route is still propagating. Re-run the job after a minute. |
-| Deploy development did not start | It only runs after *Quality gate* succeeds on a **push** to `main` (not on pull requests) |
+| Deploy development did not start | It only runs after *Quality gate* succeeds on a **push** to `main` (not on pull requests), and only when the repository variable `DEPLOY_ENABLED` is `true` |

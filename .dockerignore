@@ -1,9 +1,7 @@
 node_modules
 .git
-.tools
 .npm-cache
 .wrangler
-.sites-runtime
 .vinext
 .next
 dist

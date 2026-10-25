@@ -73,3 +73,27 @@ A different agent and tool, with no access to the implementer's context, reviewe
 2. Run `node scripts/sync-tracker-issues.mjs`.
 3. Configure the Cloudflare environments (`docs/deployment.md`) and add the live URL to the README.
 4. Complete the three required peer reviews.
+
+## 2026-10-25 — SRL-06 container failure and template cleanup (Verification and Delivery agent, Claude)
+
+**Trigger:** the first GitHub run of *Quality gate* (commit `2766dae`). The `verify` job passed (tests). The `container` job failed at `docker compose up --wait`.
+
+**Root cause.** In the runtime stage, `WORKDIR /app` creates `/app` owned by root. `COPY --chown=node:node` changes only the copied contents, not `/app` itself. At startup the app runs as the `node` user and needs to create a directory in `/app`. That fails with `EACCES: permission denied, mkdir '/app/.sites-runtime/wrangler'`, so the container exits immediately.
+
+**How it was reproduced:** in a locally built runtime image (Docker Hub is not reachable from the review environment). The image runs as `node` with a named volume, exactly like `compose.yaml`.
+
+**Fix:** `chown node:node /app /app/data` in the `Dockerfile`.
+
+**Verification:** without the fix the container exits with the error above. With it, the container is *healthy*, `scripts/smoke.mjs` passes (booking, alert, verified recovery, reservation preserved) and the data survives `docker restart`.
+
+**Template cleanup.** The project had been scaffolded from a hosted-site starter. Its unused parts were removed after confirming that nothing imported them:
+- 61 UI components, a sign-in helper, connector preview plumbing, a hosting manifest, a vendored Vite plugin, package-manager installer scripts, an example app and an unused `db/index.ts`.
+- 20 unused dependencies (690 → 509 installed packages).
+
+`vite.config.ts` and `worker/index.ts` now contain only the Cloudflare D1 binding and the API routing. This supersedes the earlier restoration of `.openai/hosting.json`, which is no longer needed.
+
+**Deployment guard.** `deploy-development.yml` now runs only when the repository variable `DEPLOY_ENABLED` is `true`. Until the owner configures Cloudflare, CI stays green instead of failing on missing credentials.
+
+**Checks after the changes:** `npm test` exit 0 (22/22 unit + integration, 4/4 browser), `tsc` clean, ESLint clean.
+
+SRL-06 stays **in progress** until the container job is green on GitHub.

@@ -1,6 +1,8 @@
 declare namespace Cloudflare {
   interface Env {
     DB?: D1Database;
-    BUCKET?: R2Bucket;
+    OLLAMA_URL?: string;
+    OLLAMA_MODEL?: string;
+    BUILD_REVISION?: string;
   }
 }

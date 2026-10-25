@@ -1,6 +1,6 @@
 # Product specification
 
-Written before domain implementation on 2026-10-25. Status: accepted implementation scope selected under the owner's instruction to choose and build the strongest course project.
+Written before domain implementation on 2026-10-25. Status: accepted scope.
 
 ## Problem and intended user
 
