@@ -6,8 +6,9 @@ Service Recovery Lab is a full-stack reservation service (React UI → Cloudflar
 
 | When you are… | Read |
 |---|---|
+| Understanding why the product exists | [Strategy, value and roadmap](docs/strategy.md) |
 | Changing any behaviour | [Product specification](docs/product-spec.md) |
-| Touching code structure, API or data | [Architecture](docs/architecture.md) |
+| Touching code structure, API or data | [Architecture](docs/architecture.md) · [Decision records](docs/decisions/README.md) |
 | Picking up or handing off work | [Agent team and process](docs/agent-team.md) · [Work log](docs/agent-work-log.md) · [Tracker](public/tracker.json) |
 | Writing or running tests | [Testing](docs/testing.md) |
 | Working on alerts, telemetry, the responder or rollback | [Operations](docs/operations.md) |

@@ -39,6 +39,19 @@ These principles come from data and AI leadership practice, and the code enforce
 4. **Privacy by design.** No personal data is collected. Telemetry and model prompts never contain request bodies, cookies or credentials, and tests enforce this.
 5. **Humans own the irreversible decisions.** Production promotion is a manual, approved step. Rollback is one click, and every deployment is smoke-tested against the business journey.
 
+## What this project demonstrates
+
+| Discipline | How it shows up here |
+|---|---|
+| **Strategy** | The problem is framed around business continuity and regulatory direction, not technology. More than a dozen candidate problems were evaluated, the scope is explicit, and value hypotheses and a roadmap are written down ([strategy](docs/strategy.md)). |
+| **Data** | A customer-journey indicator instead of proxy metrics. Explicit API contracts. Incident evidence as structured, exportable data. Privacy by design, enforced by tests. |
+| **Architecture** | One edge-serverless artifact running identically on a laptop, in Docker and in the cloud. Optimistic concurrency on SQL. Every major choice recorded as a decision with its alternatives ([ADRs](docs/decisions/README.md)). |
+| **Cloud and FinOps** | Runs entirely on free tiers (Cloudflare Workers, D1, Workers AI), with built-in caps that keep a public demo cost-bounded. |
+| **AI governance** | Bounded autonomy, a model as second opinion rather than decision-maker, human escalation for the unknown, and an audit trail of what the model proposed. |
+| **Operations** | Journey-level alerting, an on-call agent, verified recovery, runbooks, and OpenTelemetry evidence that is portable to any observability platform. |
+| **Delivery** | 33 automated tests plus 4 browser journeys, enforced code style, CI on every change, automatic deployment to development, approved production promotion and one-click rollback. |
+| **Leadership** | A human-led team of AI agents with defined roles, a public tracker, and independent verification before anything counts as done. |
+
 ## How it was built: one lead, a team of AI agents
 
 I led this project as product owner and engineering lead for a small team of AI coding agents. I set the goals and constraints, directed the evaluation of more than a dozen candidate problems, approved the specification and scope, and own every release.
@@ -53,6 +66,16 @@ The agents worked as product, implementation, verification and delivery roles:
 This is the operating model I advocate for organisations adopting AI: **humans set direction and guardrails, agents execute, and independent verification decides what is true.** Details: [agent team and process](docs/agent-team.md) · [work log](docs/agent-work-log.md) · [tracker](public/tracker.json).
 
 ---
+
+## Where this goes next
+
+Regulators are moving from *"have a recovery plan"* to *"prove that it works"*. The EU's Digital Operational Resilience Act, in force for financial entities since January 2025, is one example. At the same time, AI agents are entering operations. The natural evolution of this laboratory has three stages:
+
+1. **Bring your own journey.** Point the probe and the agent at any HTTP journey, with the allowlist defined as policy-as-code.
+2. **Integrations.** Connect to paging and chat tools.
+3. **An executive resilience scorecard.** Journey SLOs and error budgets across services, with evidence packages ready for audit.
+
+Details: [strategy, value and roadmap](docs/strategy.md).
 
 ## Try it in five minutes
 
@@ -188,7 +211,7 @@ worker/                Cloudflare Worker entry point
 tests/                 unit, adviser, OpenTelemetry, integration and browser tests
 scripts/               local runner, tests, smoke test, benchmark, demo capture, cloud config, tracker sync
 .github/workflows/     CI, deploy-development, deploy-production (manual), rollback
-docs/                  spec, architecture, agent team, testing, operations, deployment, reviewer guide
+docs/                  strategy, decisions (ADRs), spec, architecture, agent team, testing, operations, deployment, reviewer guide
 evidence/              demo recording, evidence export, benchmark, console check
 ```
 
@@ -196,11 +219,11 @@ evidence/              demo recording, evidence export, benchmark, console check
 
 This repository is also my capstone for the [AI Dev Tools Zoomcamp](https://github.com/DataTalksClub/ai-dev-tools-zoomcamp/tree/main/project) (DataTalks.Club). The criterion-by-criterion evidence, with files, commands and tests, is in **[docs/reviewer-guide.md](docs/reviewer-guide.md)**, and [AGENTS.md](AGENTS.md) is the entry point for the agent context. All documentation is in English and all data is synthetic.
 
-## Author
+## About the author
 
 **Carlos Saritama** · [github.com/cssaritama](https://github.com/cssaritama)
 
-Part of a portfolio on turning data and AI into accountable business outcomes.
+I work where data, AI and business strategy meet. My focus is on making them measurable, governed and accountable to the outcomes an organisation actually cares about. Service Recovery Lab applies that conviction to a question every leadership team eventually faces: *when something breaks, can we prove that our customers are served again, and that our automation acted within the limits we set?*
 
 ## License
 
