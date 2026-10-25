@@ -1,0 +1,241 @@
+{
+  "format": "service-recovery-evidence/v1",
+  "exportedAt": "2026-10-25T09:18:09.225Z",
+  "dataClassification": "synthetic",
+  "scope": "one authenticated workspace; controlled lab evidence, not production resilience",
+  "schemaVersion": 1,
+  "id": "11c6da3b-b15f-4787-b078-3f361d24ba4b",
+  "createdAt": 1792919887054,
+  "config": {
+    "catalog": "catalog-v1",
+    "adapter": "ready",
+    "unknownFault": false,
+    "revision": 2
+  },
+  "slots": [
+    {
+      "id": "morning",
+      "label": "Morning consultation",
+      "time": "09:00–10:00",
+      "capacity": 3,
+      "remaining": 2
+    },
+    {
+      "id": "midday",
+      "label": "Midday consultation",
+      "time": "12:00–13:00",
+      "capacity": 2,
+      "remaining": 2
+    },
+    {
+      "id": "afternoon",
+      "label": "Afternoon consultation",
+      "time": "15:00–16:00",
+      "capacity": 3,
+      "remaining": 3
+    }
+  ],
+  "reservations": [
+    {
+      "id": "fe5a3193-307a-43b9-bc8c-24002326a715",
+      "slotId": "morning",
+      "key": "1aa72dd1-234b-46ec-8ec8-3065edd5122d",
+      "createdAt": 1792919887305,
+      "probe": false
+    },
+    {
+      "id": "ddd21885-b974-45d4-8c7b-8ba1c6689e54",
+      "slotId": "probe",
+      "key": "agent_60afa1c7-b4aa-4f03-b2de-8ee6dfaa2641",
+      "createdAt": 1792919888681,
+      "probe": true
+    }
+  ],
+  "incident": {
+    "id": "87c5bbcb-5131-4ab7-b13f-6171c0d7c833",
+    "kind": "catalog_unavailable",
+    "status": "recovered",
+    "openedAt": 1792919887673,
+    "configRevision": 1,
+    "steps": [
+      {
+        "at": 1792919887673,
+        "phase": "Fault",
+        "tool": "inject_workspace_fault",
+        "outcome": "applied",
+        "detail": "A controlled fault affects this workspace only. Existing reservations are unchanged."
+      },
+      {
+        "at": 1792919888643,
+        "phase": "Alert",
+        "tool": "evaluate_user_impact",
+        "outcome": "triggered",
+        "detail": "Three consecutive unavailable reservation attempts. Validation errors are excluded."
+      },
+      {
+        "at": 1792919888654,
+        "phase": "Observe",
+        "tool": "read_service_state",
+        "outcome": "complete",
+        "detail": "Read configuration and the three-attempt user-impact alert. No customer payloads are sent to reasoning."
+      },
+      {
+        "at": 1792919888667,
+        "phase": "Diagnose",
+        "tool": "select_allowlisted_repair",
+        "outcome": "restore_catalog",
+        "detail": "Reasoner: bounded-policy. The repair must agree with observed state and cannot change reservations."
+      },
+      {
+        "at": 1792919888667,
+        "phase": "Repair",
+        "tool": "restore_catalog",
+        "outcome": "applied",
+        "detail": "Restored the known-good configuration using a revision-checked database update."
+      },
+      {
+        "at": 1792919888727,
+        "phase": "Verify",
+        "tool": "exercise_reservation_api",
+        "outcome": "passed",
+        "detail": "Positive probe HTTP 201; invalid-input probe HTTP 422; durable probe reservation confirmed."
+      }
+    ],
+    "alertedAt": 1792919888643,
+    "traceId": "e8d7fb69e4b946cdbf8eae7f2fd6d33c",
+    "runId": "4b7fbc88-60b4-4567-8bff-72c513e875c0",
+    "verification": {
+      "positive": 201,
+      "negative": 422,
+      "persisted": true
+    },
+    "completedAt": 1792919888727
+  },
+  "history": [],
+  "traces": [
+    {
+      "traceId": "0ba8837833d44b189ea55d99ac174f7d",
+      "spanId": "bece0ef455a74f29",
+      "at": 1792919887314,
+      "durationMs": 13,
+      "span": "reservation.journey",
+      "status": 201,
+      "log": {
+        "event": "reservation.completed",
+        "component": "reservation-service",
+        "outcome": "reservation_confirmed"
+      },
+      "metric": {
+        "name": "reservation_journey_total",
+        "value": 1,
+        "journey": "visitor_booking",
+        "outcome": "success"
+      }
+    },
+    {
+      "traceId": "947c6848e22f45f3a7b7740c13740543",
+      "spanId": "87621d219cc94fbc",
+      "at": 1792919887999,
+      "durationMs": 13,
+      "span": "reservation.journey",
+      "status": 503,
+      "log": {
+        "event": "reservation.completed",
+        "component": "reservation-service",
+        "outcome": "catalog_unavailable"
+      },
+      "metric": {
+        "name": "reservation_journey_total",
+        "value": 1,
+        "journey": "synthetic_probe",
+        "outcome": "unavailable"
+      }
+    },
+    {
+      "traceId": "e2ba3b5690144b169566dbe222ba43cd",
+      "spanId": "d798492d6af3436a",
+      "at": 1792919888328,
+      "durationMs": 15,
+      "span": "reservation.journey",
+      "status": 503,
+      "log": {
+        "event": "reservation.completed",
+        "component": "reservation-service",
+        "outcome": "catalog_unavailable"
+      },
+      "metric": {
+        "name": "reservation_journey_total",
+        "value": 1,
+        "journey": "synthetic_probe",
+        "outcome": "unavailable"
+      }
+    },
+    {
+      "traceId": "e8d7fb69e4b946cdbf8eae7f2fd6d33c",
+      "spanId": "d78a655b90334d79",
+      "at": 1792919888643,
+      "durationMs": 12,
+      "span": "reservation.journey",
+      "status": 503,
+      "log": {
+        "event": "reservation.completed",
+        "component": "reservation-service",
+        "outcome": "catalog_unavailable"
+      },
+      "metric": {
+        "name": "reservation_journey_total",
+        "value": 1,
+        "journey": "synthetic_probe",
+        "outcome": "unavailable"
+      }
+    },
+    {
+      "traceId": "e4b8e58531174797814c86a422b4a654",
+      "spanId": "9edaa94e389a4768",
+      "at": 1792919888690,
+      "durationMs": 13,
+      "span": "reservation.journey",
+      "status": 201,
+      "log": {
+        "event": "reservation.completed",
+        "component": "reservation-service",
+        "outcome": "reservation_confirmed"
+      },
+      "metric": {
+        "name": "reservation_journey_total",
+        "value": 1,
+        "journey": "synthetic_probe",
+        "outcome": "success"
+      }
+    },
+    {
+      "traceId": "0840639564714496b2bd1f393fd9db67",
+      "spanId": "f67725b1b8324fa7",
+      "at": 1792919888716,
+      "durationMs": 16,
+      "span": "reservation.journey",
+      "status": 422,
+      "log": {
+        "event": "reservation.completed",
+        "component": "reservation-service",
+        "outcome": "invalid_slot"
+      },
+      "metric": {
+        "name": "reservation_journey_total",
+        "value": 1,
+        "journey": "visitor_booking",
+        "outcome": "rejected"
+      }
+    }
+  ],
+  "failureStreak": 0,
+  "metrics": {
+    "customerGood": 1,
+    "customerBad": 0,
+    "probeGood": 1,
+    "probeBad": 3,
+    "rejected": 1,
+    "recoveries": 1
+  },
+  "serviceAvailable": true
+}

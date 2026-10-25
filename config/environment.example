@@ -1,0 +1,7 @@
+# Copy to .env only if using Docker Compose. Do not commit .env.
+SRL_PORT=3000
+# Optional local model adviser. Leave blank for the bounded-policy responder.
+OLLAMA_URL=
+OLLAMA_MODEL=qwen2.5:0.5b
+# With an Ollama server on your host, Docker can use:
+# OLLAMA_URL=http://host.docker.internal:11434

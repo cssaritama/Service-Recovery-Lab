@@ -1,0 +1,21 @@
+{
+  "recordedAt": "2026-10-25T09:18:23.084Z",
+  "scope": "Small synthetic HTTP benchmark of the local production Worker build; not a production capacity test",
+  "node": "v24.22.1",
+  "platform": "win32",
+  "architecture": "x64",
+  "requests": 48,
+  "concurrency": 12,
+  "successes": 48,
+  "p50Ms": 206.11,
+  "p95Ms": 233.44,
+  "maxMs": 233.64,
+  "wallTimeMs": 862,
+  "observedRequestsPerSecond": 55.66,
+  "limitations": [
+    "Local machine and local D1 emulator",
+    "No internet latency, multi-region traffic or sustained load",
+    "Sessions were pre-created; each booking persists state and telemetry",
+    "Results do not establish an SLA or production throughput"
+  ]
+}
