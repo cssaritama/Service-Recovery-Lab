@@ -146,3 +146,23 @@ SRL-06 stays **in progress** until the container job is green on GitHub.
 - the original reservation was preserved.
 
 SRL-06 and SRL-07 → **done**.
+
+## 2026-10-25 — Executive resilience report (Delivery agent, session B)
+
+**Owner request:** make the project speak to an executive committee as well as to engineers. Translate operational evidence into objectives, risk and decisions about AI autonomy.
+
+**Added:**
+- `lib/recovery/report.ts`, `GET /api/report` and the `/report` page: a printable one-pager with
+  - objective attainment against a 15-minute recovery time objective;
+  - time to detect and time to verified recovery;
+  - AI autonomy rate and customer impact;
+  - a recommendation per failure class.
+- The rule for expanding autonomy: at least three incidents of a class, all verified within the objective and none escalated.
+- The workspace's *Verified recoveries* card now states whether the last recovery was inside the objective.
+
+**Defect caught during review:** when an operator restored an incident the agent had already escalated, it was counted as a restore only, and the autonomy rate read 100%. Escalations are now detected from the timeline, so a human fix is never credited to the AI. A test covers this case.
+
+**Verification:**
+- `npm test`: 40/40 unit, adviser, OpenTelemetry, report and integration tests, and 5/5 browser journeys.
+- Prettier and ESLint were clean.
+- The report was reviewed visually after four drills (screenshot in `docs/screenshots/executive-report.png`).

@@ -30,6 +30,8 @@ Service Recovery Lab answers those three questions in one working system:
 | *Are customers affected right now?* | Measures the critical journey (a booking) directly. Pages only when customers fail, not when a CPU graph moves. A green health check does not hide an outage. |
 | *Can we trust AI to act in production?* | The on-call agent has **bounded autonomy**: two allowlisted repairs, revision-checked writes and a language-model second opinion that can confirm but never widen its authority. When unsure, it hands over to a human. |
 | *Did we actually recover?* | "Recovered" requires a real customer-style booking to succeed **and** invalid input to still be rejected **and** existing records to be intact. Otherwise the incident escalates. |
+| *Are we inside our recovery objective?* | Every verified recovery is measured against a **recovery time objective (RTO)** and reported as objective attainment, not as raw seconds. |
+| *Where should we let AI act on its own, and where not?* | The **[executive resilience report](https://service-recovery-lab.cssaritama.workers.dev/report)** turns the incident record into a decision for each failure class: expand autonomy, keep human review, keep it human-owned, or gather more evidence. Expanding autonomy requires a minimum body of verified evidence. |
 | *Can we show it to an auditor or a board?* | Every incident yields a causal, trace-linked record (fault → alert → diagnosis → repair → verification), exportable as JSON and as OpenTelemetry. |
 | *What does it cost to run?* | It runs on free tiers (Cloudflare Workers, D1, Workers AI) and on any laptop with one Docker command. |
 
@@ -48,12 +50,13 @@ These principles come from data and AI leadership practice, and the code enforce
 | Discipline | How it shows up here |
 |---|---|
 | **Strategy** | The problem is framed around business continuity and regulatory direction, not technology. More than a dozen candidate problems were evaluated, the scope is explicit, and value hypotheses and a roadmap are written down ([strategy](docs/strategy.md)). |
+| **Decision intelligence** | Operational telemetry becomes leadership decisions: objective attainment, AI autonomy rate and a per-failure-class recommendation on where automation has earned trust, in a one-page, printable executive report. |
 | **Data** | A customer-journey indicator instead of proxy metrics. Explicit API contracts. Incident evidence as structured, exportable data. Privacy by design, enforced by tests. |
 | **Architecture** | One edge-serverless artifact running identically on a laptop, in Docker and in the cloud. Optimistic concurrency on SQL. Every major choice recorded as a decision with its alternatives ([ADRs](docs/decisions/README.md)). |
 | **Cloud and FinOps** | Runs entirely on free tiers (Cloudflare Workers, D1, Workers AI), with built-in caps that keep a public demo cost-bounded. |
 | **AI governance** | Bounded autonomy, a model as second opinion rather than decision-maker, human escalation for the unknown, and an audit trail of what the model proposed. |
 | **Operations** | Journey-level alerting, an on-call agent, verified recovery, runbooks, and OpenTelemetry evidence that is portable to any observability platform. |
-| **Delivery** | 35 automated tests plus 4 browser journeys, enforced code style, CI on every change, automatic deployment to development, approved production promotion and one-click rollback. |
+| **Delivery** | 40 automated tests plus 5 browser journeys, enforced code style, CI on every change, automatic deployment to development, approved production promotion and one-click rollback. |
 | **Leadership** | A human-led team of AI agents with defined roles, a public tracker, and independent verification before anything counts as done. |
 
 ## How it was built: one lead, a team of AI agents
@@ -98,10 +101,11 @@ Or without Docker (Node.js 24+): `npm ci && npm run local`.
 4. **Open *Journey telemetry*.** One trace ID links the span, the structured log and the metric. Download the same data as OpenTelemetry.
 5. **Try *Unrecognized dependency failure*.** The correct outcome is **escalation**. The agent does not guess.
 6. **Export the evidence package.** Your original booking is still there.
+7. **Open the [executive report](https://service-recovery-lab.cssaritama.workers.dev/report).** The drills you ran become objective attainment, an AI autonomy rate and a decision per failure class, on one printable page.
 
-| Baseline booking | Correlated telemetry | Mobile |
+| Executive report | Correlated telemetry | Mobile |
 |---|---|---|
-| ![](docs/screenshots/workspace.png) | ![](docs/screenshots/telemetry.png) | ![](docs/screenshots/mobile.png) |
+| ![](docs/screenshots/executive-report.png) | ![](docs/screenshots/telemetry.png) | ![](docs/screenshots/mobile.png) |
 
 ---
 
@@ -189,12 +193,13 @@ The guardrails cannot be bypassed:
 
 ## Engineering quality
 
-- **35 automated tests plus 4 browser journeys, one command** (`npm test`):
+- **40 automated tests plus 5 browser journeys, one command** (`npm test`):
   - 9 domain unit tests
   - 9 model-adviser tests (JSON mode, parsing, response formats, timeouts, disagreement → escalation)
   - 4 OpenTelemetry tests (encoding, a real HTTP collector, redaction)
+  - 5 executive-report tests (objective attainment, autonomy rate, evidence thresholds, escalations never flattering the AI)
   - 13 integration tests on a real SQLite database (isolation, concurrency without overselling, end-to-end recovery, stale and duplicate agent runs, persistence)
-  - 4 Playwright browser journeys (desktop and mobile)
+  - 5 Playwright browser journeys (desktop, mobile and the executive report)
   
   See [docs/testing.md](docs/testing.md).
 - **CI on every pull request:** formatting, lint, tests, then the full system in Docker with a journey smoke test.
@@ -210,8 +215,8 @@ The guardrails cannot be bypassed:
 ## Repository layout
 
 ```
-app/                   UI: recovery workspace, /guide, /tracker
-lib/recovery/          domain · agent · advisers (Workers AI / Ollama) · otel (OTLP) · api · repository
+app/                   UI: recovery workspace, /report (executive report), /guide, /tracker
+lib/recovery/          domain · agent · advisers (Workers AI / Ollama) · report (executive) · otel (OTLP) · api · repository
 db/, drizzle/          schema and SQL migrations
 worker/                Cloudflare Worker entry point
 tests/                 unit, adviser, OpenTelemetry, integration and browser tests

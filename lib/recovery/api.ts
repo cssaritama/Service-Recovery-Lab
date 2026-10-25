@@ -12,6 +12,7 @@ import { Repository, RepoError, hashToken, newToken, type Database } from './rep
 import { respond } from './agent.ts';
 import { selectAdvisor, type WorkersAI } from './advisers.ts';
 import { exportAttempt, toOtlp } from './otel.ts';
+import { executiveReport } from './report.ts';
 export interface Environment {
   DB: Database;
   AI?: WorkersAI;
@@ -108,6 +109,9 @@ export async function handleApi(
           ? { 'content-disposition': 'attachment; filename="recovery-evidence.json"' }
           : {},
       );
+    }
+    if (request.method === 'GET' && path === '/api/report') {
+      return reply(executiveReport(await repo.read(current.id)));
     }
     if (request.method === 'GET' && path === '/api/telemetry/otlp') {
       const s = await repo.read(current.id);

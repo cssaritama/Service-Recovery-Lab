@@ -12,6 +12,7 @@ for (const args of [
     'tests/domain.test.mjs',
     'tests/advisers.test.mjs',
     'tests/otel.test.mjs',
+    'tests/report.test.mjs',
     'tests/integration.test.mjs',
   ],
   ['node_modules/vinext/dist/cli.js', 'build'],

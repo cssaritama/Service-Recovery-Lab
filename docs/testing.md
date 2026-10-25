@@ -11,7 +11,7 @@ npm test
 `npm test` ([`scripts/test.mjs`](../scripts/test.mjs)) runs four stages in order and exits non-zero on the first failure:
 
 1. **Typecheck:** `tsc --noEmit`
-2. **Unit, adviser, OpenTelemetry and integration:** Node.js built-in test runner (35 tests). Results go to stdout and to `test-results/unit-integration.xml` (JUnit).
+2. **Unit, adviser, OpenTelemetry and integration:** Node.js built-in test runner (40 tests). Results go to stdout and to `test-results/unit-integration.xml` (JUnit).
 3. **Production build:** `vinext build`
 4. **Browser tests:** Playwright starts the production build on port 4317 against an isolated test database. Results go to `test-results/browser.xml` and `playwright-report/`.
 
@@ -57,6 +57,16 @@ Pure domain rules, no I/O.
 | export skipped without endpoint, never throws when the collector is down | Best-effort export |
 | each booking is pushed to an OTLP/HTTP collector without payloads | A real HTTP collector receives `/v1/traces`, `/v1/logs` and `/v1/metrics` with auth headers; no payload or cookie leaks; `/api/telemetry/otlp` download requires a session |
 
+### Executive-report tests: `tests/report.test.mjs` (5)
+
+| Test | Guarantees |
+|---|---|
+| headline measures | Objective attainment, medians, autonomy rate excluding operator restores, customer success rate |
+| autonomy recommended only with enough verified evidence within the objective | Threshold of three incidents; a single objective miss or escalation blocks the recommendation |
+| an escalation stays an escalation after an operator restore | The AI is never credited for a human fix |
+| unknown failures stay human-owned; open incidents and empty workspaces | Edge cases |
+| `GET /api/report` reflects a real verified recovery and requires a session | End-to-end through the API and SQLite |
+
 ### Integration tests: `tests/integration.test.mjs` (13)
 These run the real API handler against a **real SQLite database** created from the production migration (`tests/sqlite-adapter.mjs`), plus one test over a real HTTP server.
 
@@ -75,7 +85,7 @@ These run the real API handler against a **real SQLite database** created from t
 | stale agent action cannot overwrite an owner restore | Revision check protects operator actions |
 | concurrent responder invocations claim a single repair | Exactly one repair step |
 
-### Frontend / end-to-end tests: `tests/browser/journeys.spec.ts` (4)
+### Frontend / end-to-end tests: `tests/browser/journeys.spec.ts` (5)
 Chromium against the production build.
 
 | Test | Covers |
@@ -83,6 +93,7 @@ Chromium against the production build.
 | a visitor books, refreshes, recovers and inspects correlated evidence | Full journey through the UI, persistence after reload, guided drill to *Recovery independently checked*, trace drill-down showing span, log and metric, evidence API, no page errors |
 | unsupported faults require review and manual restore | Escalation path in the UI |
 | two browser contexts cannot affect each other | A fault in one session; booking still succeeds in the other |
+| the executive report turns a verified recovery into leadership measures | Guided drill → `/report` shows 100% objective attainment and a *Gather evidence* recommendation |
 | mobile layout, keyboard entry and public project pages | 390 px with no horizontal scroll, skip link focus, `/tracker` (7 tasks), `/guide` |
 
 ### Deployment smoke test: `scripts/smoke.mjs`

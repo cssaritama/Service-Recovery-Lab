@@ -29,6 +29,7 @@ flowchart TB
 - `app/page.tsx`: the recovery workspace, a client component. It has three views: *Recovery workspace* (book, drill, timeline), *Journey telemetry* (trace table and correlated signal detail) and *Recovery evidence* (verification summary and incident history). It polls `/api/workspace` once per second only while an incident is active.
 - `app/guide/page.tsx`: the field guide and methodology.
 - `app/tracker/page.tsx`: the public task tracker, rendered from `public/tracker.json`.
+- `app/report/page.tsx`: the executive resilience report, a one-page, printable view for leadership.
 - Accessibility: skip link, semantic landmarks, labelled controls, keyboard operation, responsive down to 360 px. Reduced motion is respected.
 
 ### API — `lib/recovery/api.ts`
@@ -40,6 +41,7 @@ A framework-free `Request → Response` handler, so it can be tested without a s
 | `POST /api/session` | Creates an isolated workspace and sets an `HttpOnly; SameSite=Strict` cookie |
 | `GET /api/workspace` | Workspace snapshot: slots with remaining capacity, reservations, incident, traces, metrics |
 | `GET /api/evidence` | The same snapshot as a downloadable, sanitised evidence package |
+| `GET /api/report` | Executive resilience report: objective attainment, AI autonomy rate, customer impact and a recommendation per failure class |
 | `GET /api/telemetry/otlp` | The workspace's retained telemetry as OpenTelemetry OTLP/JSON (traces, logs, metrics) |
 | `POST /api/reservations` | Visitor booking. Requires an `Idempotency-Key` header. |
 | `POST /api/probe` | Synthetic probe booking against the reserved probe slot |
@@ -66,6 +68,16 @@ A tool-using agent with four phases: **observe → diagnose → repair → verif
 
 ### Model adviser — `lib/recovery/advisers.ts`
 Optional second opinion from a language model: Cloudflare Workers AI in the cloud, Ollama locally. It receives three booleans, and its answer is parsed into one allowlisted action. Disagreement, malformed output or timeout → escalation.
+
+### Executive report — `lib/recovery/report.ts`
+A pure function from the incident record to leadership measures:
+- **objective attainment** against a 15-minute recovery time objective (RTO);
+- time to detect and time to verified recovery;
+- **AI autonomy rate**: agent recoveries ÷ agent-handled incidents. An escalation counts against autonomy even if an operator later restores service;
+- customer impact;
+- a recommendation per failure class: *expand autonomy* (requires at least three incidents, all verified within the RTO), *keep human review*, *human-owned* or *gather evidence*.
+
+It is rendered at `/report` as a printable one-page view.
 
 ### OpenTelemetry encoder — `lib/recovery/otel.ts`
 Encodes journey signals as OTLP/JSON traces, logs and metrics. It serves `/api/telemetry/otlp` and pushes live to a collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set.

@@ -60,7 +60,8 @@
         "Browser tests 1 and 4",
         "docs/screenshots/*.png",
         "evidence/local-demo.webm",
-        "tests/otel.test.mjs: OpenTelemetry export, Grafana via compose.observability.yaml"
+        "tests/otel.test.mjs: OpenTelemetry export, Grafana via compose.observability.yaml",
+        "Executive resilience report at /report (tests/report.test.mjs, browser test 5)"
       ]
     },
     {
@@ -74,7 +75,7 @@
       ],
       "agent": "Verification agent",
       "evidence": [
-        "npm test: 35/35 unit + adviser + OpenTelemetry + integration, 4/4 browser",
+        "npm test: 40/40 unit + adviser + OpenTelemetry + report + integration, 5/5 browser",
         "Mobile overflow defect found and fixed during review"
       ]
     },

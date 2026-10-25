@@ -23,6 +23,7 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import type { State, Trace, Fault, Incident } from '../lib/recovery/domain';
+import { RECOVERY_TIME_OBJECTIVE_MS } from '../lib/recovery/report';
 type Snapshot = Omit<State, 'slots'> & {
   slots: (State['slots'][number] & { remaining: number })[];
   serviceAvailable: boolean;
@@ -212,6 +213,10 @@ export default function Home() {
             <LifeBuoy size={18} />
             Field guide
           </a>
+          <a className="nav-item" href="/report">
+            <FileCheck2 size={18} />
+            Executive report
+          </a>
           <a className="nav-item" href="/tracker">
             <SquareTerminal size={18} />
             Public task tracker
@@ -310,7 +315,7 @@ export default function Home() {
                   value={String(s.metrics.recoveries)}
                   detail={
                     last
-                      ? `Last recovery ${elapsed(last.completedAt! - last.openedAt)} from fault to verification`
+                      ? `Last recovery ${elapsed(last.completedAt! - last.openedAt)} from fault to verification · ${last.completedAt! - last.openedAt <= RECOVERY_TIME_OBJECTIVE_MS ? 'within' : 'outside'} the 15-min objective`
                       : 'A configuration change alone is not a recovery.'
                   }
                   icon={<ShieldCheck size={18} />}

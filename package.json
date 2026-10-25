@@ -21,7 +21,7 @@
     "db:generate": "drizzle-kit generate",
     "local": "node scripts/local.mjs",
     "test": "node scripts/test.mjs",
-    "test:core": "node --test tests/domain.test.mjs tests/advisers.test.mjs tests/otel.test.mjs tests/integration.test.mjs",
+    "test:core": "node --test tests/domain.test.mjs tests/advisers.test.mjs tests/otel.test.mjs tests/report.test.mjs tests/integration.test.mjs",
     "test:browser": "playwright test",
     "typecheck": "tsc --noEmit",
     "cloud:prepare": "node scripts/cloud-prepare.mjs",

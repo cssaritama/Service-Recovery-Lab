@@ -73,3 +73,23 @@ test('mobile layout, keyboard entry and public project pages', async ({ page }) 
   await page.goto('/guide');
   await expect(page.getByRole('heading', { name: 'Recovery needs evidence.' })).toBeVisible();
 });
+
+test('the executive report turns a verified recovery into leadership measures', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Run guided recovery drill' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Run guided recovery drill' }).click();
+  await expect(page.getByText('Recovery independently checked', { exact: true })).toBeVisible({
+    timeout: 45000,
+  });
+  await page.goto('/report');
+  await expect(
+    page.getByRole('heading', { name: /has the AI earned the right to act/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Decisions for the leadership team' }),
+  ).toBeVisible();
+  await expect(page.locator('.report-kpis .stat-value').first()).toHaveText('100%');
+  await expect(page.getByText('Gather evidence', { exact: true })).toBeVisible();
+});

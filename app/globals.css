@@ -1252,3 +1252,58 @@ td {
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+
+.report-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.report-actions > a {
+  font-size: 12px;
+  color: #267969;
+}
+.report-kpis {
+  grid-template-columns: repeat(4, 1fr);
+}
+.report-decisions ol {
+  margin: 12px 0 0;
+  padding-left: 22px;
+  list-style: decimal;
+}
+.report-decisions li {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #24414a;
+}
+.report-rationale {
+  display: block;
+  font-size: 10px;
+  color: #71868f;
+  margin-top: 4px;
+  max-width: 420px;
+}
+@media (max-width: 900px) {
+  .report-kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .report-kpis {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  .report-actions,
+  .skip-link {
+    display: none;
+  }
+  .report-page {
+    padding: 0;
+  }
+  .panel,
+  .stat-card {
+    break-inside: avoid;
+  }
+}
