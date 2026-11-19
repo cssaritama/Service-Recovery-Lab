@@ -13,7 +13,7 @@ To maintain context hygiene and prevent hallucination, agents MUST observe the f
 | Action | Permitted Boundaries | Forbidden Boundaries |
 | :--- | :--- | :--- |
 | **Where to Read on Startup** (Max 4 files) | 1. `AGENTS.md` (this file)<br>2. `README.md`<br>3. `docs/product-spec.md`<br>4. `package.json` | Do **NOT** read entire dependency trees or non-essential documents upfront. |
-| **Where to Write** | `app/`, `config/`, `db/`, `docs/`, `lib/`, `tests/`, `worker/`, `scripts/` | Do **NOT** write operational logs or cross-portfolio items locally; route portfolio-wide tasks to `portfolio-ops/MASTER_BACKLOG.md`. |
+| **Where to Write** | `app/`, `config/`, `db/`, `docs/`, `lib/`, `tests/`, `worker/`, `scripts/` | Do **NOT** write operational logs or cross-portfolio items locally; route portfolio-wide tasks to `systems-studio-portfolio-ops/MASTER_BACKLOG.md`. |
 | **Where NOT to Read** | Active source code and configuration files | Strictly NEVER inspect or parse files in `archive/`, `past_version/`, `node_modules/`, `.next/`, or `.wrangler/`. |
 
 ---
@@ -48,7 +48,7 @@ Every agent turn operating on non-trivial architecture or operational decisions 
 
 ## 4. Systems Studio Universal Rules (#10–#13)
 
-- **Rule #10 (Backlog Auto-Registration):** Any new cross-portfolio feature, risk, or bug discovered must be formally logged in `portfolio-ops/MASTER_BACKLOG.md`.
+- **Rule #10 (Backlog Auto-Registration):** Any new cross-portfolio feature, risk, or bug discovered must be formally logged in `systems-studio-portfolio-ops/MASTER_BACKLOG.md`.
 - **Rule #11 (CI Workflow Parity):** Local test runs (`npm test`) must match continuous integration pipelines exactly.
 - **Rule #12 (Dimensional Invariance, Anti-Tautology & Statistical Rigor):** Latency metrics, recovery windows, and SLA thresholds must use genuine physical measurements. Never rely on tautological mock assertions.
 - **Rule #13 (Automated Code-Rule Checker & Root Test Isolation):** Test runners MUST isolate test directories and explicitly ignore `archive/`, `past_version/`, `node_modules/`, and `.wrangler/`.
